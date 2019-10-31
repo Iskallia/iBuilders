@@ -1,8 +1,7 @@
 package iskallia.ibuilders.event;
 
+import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class EventMod {
 
@@ -14,6 +13,9 @@ public class EventMod {
 
     public static void onPostInitialization(FMLPostInitializationEvent event) { }
 
-    public static void onServerStart(FMLServerStartingEvent event) { }
+    public static void onServerStart(FMLServerStartingEvent event) {
+        event.getServer().setGameType(GameType.CREATIVE);
+        event.getServer().setForceGamemode(true);
+    }
 
 }
