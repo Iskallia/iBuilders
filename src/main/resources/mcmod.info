@@ -1,0 +1,16 @@
+[
+{
+  "modid": "ibuilders",
+  "name": "iBuilders",
+  "description": "Twitch integration gameplay for FunCraft.",
+  "version": "1.12-${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/Iskallia/iBuilders/",
+  "updateUrl": "",
+  "authorList": ["KaptainWutax","iGoodie"],
+  "credits": "Iskall85 for designing and testing the mod.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
