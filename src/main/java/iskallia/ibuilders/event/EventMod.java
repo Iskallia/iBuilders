@@ -1,5 +1,6 @@
 package iskallia.ibuilders.event;
 
+import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.init.InitSchematic;
 import iskallia.ibuilders.net.NetworkThread;
@@ -20,8 +21,11 @@ public class EventMod {
     }
 
     public static void onServerStart(FMLServerStartingEvent event) {
-        event.getServer().setGameType(GameType.CREATIVE);
-        event.getServer().setForceGamemode(true);
+        if (event.getSide().isServer()) {
+            event.getServer().setGameType(GameType.CREATIVE);
+            event.getServer().setForceGamemode(true);
+        }
+        event.registerServerCommand(new CommandDebugBuilders());
         new NetworkThread().start();
     }
 

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=up": { "model": "ibuilders:schema_marker" },
+    "facing=down": { "model": "ibuilders:schema_marker", "x": 180 },
+    "facing=east": { "model": "ibuilders:schema_marker", "y": 90, "x": 90 },
+    "facing=south": { "model": "ibuilders:schema_marker", "y": 180, "x": 90 },
+    "facing=west": { "model": "ibuilders:schema_marker", "y": 270, "x": 90 },
+    "facing=north": { "model": "ibuilders:schema_marker", "y": 0, "x": 90 }
+  }
+}
