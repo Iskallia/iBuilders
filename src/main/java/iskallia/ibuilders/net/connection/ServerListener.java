@@ -4,10 +4,8 @@ import iskallia.ibuilders.net.packet.Packet;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ServerListener extends Thread {
@@ -16,6 +14,8 @@ public class ServerListener extends Thread {
 
     private ServerSocket serverSocket;
     private Map<Integer, Listener> listeners = new HashMap<>();
+
+    private List<Consumer<Listener>> connectionEstablishedConsumers = new ArrayList<>();
 
     public ServerListener(int port) {
         try {
@@ -28,8 +28,6 @@ public class ServerListener extends Thread {
 
     private void listen() {
         try {
-            System.out.println("Server Started.");
-
             while(this.isConnected() && !serverSocket.isClosed()) {
                 Listener listener = new Listener(serverSocket.accept());
                 listener.setServer(this);
@@ -37,6 +35,7 @@ public class ServerListener extends Thread {
 
                 if(listener.isConnected()) {
                     this.listeners.put(listener.getListenerId(), listener);
+                    this.connectionEstablishedConsumers.forEach(listenerConsumer -> listenerConsumer.accept(listener));
                 }
 
                 this.listeners = this.listeners.entrySet().stream()
@@ -48,6 +47,10 @@ public class ServerListener extends Thread {
         }
 
         this.disconnect();
+    }
+
+    public void onConnectionEstablished(Consumer<Listener> listenerConsumer) {
+        this.connectionEstablishedConsumers.add(listenerConsumer);
     }
 
     public boolean isConnected() {
