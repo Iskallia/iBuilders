@@ -86,7 +86,7 @@ public class Listener extends Thread {
             String data = this.readPacket();
             if(data == null)continue;
 
-            PACKET_HANDLER.onPacketRecieved(data, this.getContext());
+            PACKET_HANDLER.onPacketReceived(data, this.getContext());
         }
 
         this.disconnect();

@@ -10,7 +10,7 @@ public class PacketHandler {
 
     private static Gson GSON = new GsonBuilder().create();
 
-    public Packet onPacketRecieved(String rawData, Context context) {
+    public Packet onPacketReceived(String rawData, Context context) {
         if(rawData.length() < 2)return null;
 
         int id = Integer.parseInt(rawData.charAt(0) + "");
