@@ -13,6 +13,14 @@ public class NetAddress {
         this.port = port;
     }
 
+    public String getIp() {
+        return this.ip;
+    }
+
+    public int getPort() {
+        return this.port;
+    }
+
     @Override
     public String toString() {
         return this.ip + ":" + port;
