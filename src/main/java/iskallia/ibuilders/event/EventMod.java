@@ -1,6 +1,7 @@
 package iskallia.ibuilders.event;
 
 import iskallia.ibuilders.init.InitConfig;
+import iskallia.ibuilders.init.InitSchematic;
 import iskallia.ibuilders.net.NetworkThread;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
@@ -15,6 +16,7 @@ public class EventMod {
 
     public static void onPostInitialization(FMLPostInitializationEvent event) {
         InitConfig.registerConfigs();
+        InitSchematic.registerSchematics();
     }
 
     public static void onServerStart(FMLServerStartingEvent event) {
