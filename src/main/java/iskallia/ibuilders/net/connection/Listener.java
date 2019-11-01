@@ -25,7 +25,8 @@ public class Listener extends Thread {
     private DataOutputStream socketOutputStream;
     private boolean shouldDisconnect;
 
-    private Side side;
+    private Side side = Side.CLIENT;
+    private ServerListener serverListener;
 
     public Listener(Socket socket) {
         System.out.println("Connecting to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + ".");
@@ -63,14 +64,18 @@ public class Listener extends Thread {
         return this.listenerId;
     }
 
+    public void setServer(ServerListener serverListener) {
+        this.side = Side.SERVER;
+        this.serverListener = serverListener;
+    }
+
     private Context getContext() {
         if(this.side == Side.CLIENT) {
             ClientContext clientContext = new ClientContext();
             return clientContext;
         } else if(this.side == Side.SERVER) {
             ServerContext serverContext = new ServerContext();
-            //TODO: Get the server listener instance.
-            //serverContext.serverListener = ;
+            serverContext.serverListener = this.serverListener;
             serverContext.listener = this;
             return serverContext;
         }

@@ -32,6 +32,7 @@ public class ServerListener extends Thread {
 
             while(this.isConnected() && !serverSocket.isClosed()) {
                 Listener listener = new Listener(serverSocket.accept());
+                listener.setServer(this);
                 listener.start();
 
                 if(listener.isConnected()) {
