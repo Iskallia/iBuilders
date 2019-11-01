@@ -1,12 +1,14 @@
 package iskallia.ibuilders.net;
 
+import com.google.gson.annotations.Expose;
+
 import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
 public class NetAddress {
 
-    private String ip;
-    private int port;
+    @Expose private String ip;
+    @Expose private int port;
 
     public NetAddress(String ip, int port) {
         this.ip = ip.trim();
@@ -19,6 +21,18 @@ public class NetAddress {
 
     public int getPort() {
         return this.port;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof NetAddress) {
+            NetAddress netAddress = (NetAddress)obj;
+            if(this.getPort() != netAddress.getPort())return false;
+            if(!this.getIp().equals(netAddress.getIp()))return false;
+            return true;
+        }
+
+        return false;
     }
 
     @Override

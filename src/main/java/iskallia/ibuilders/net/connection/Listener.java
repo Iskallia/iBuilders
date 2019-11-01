@@ -1,10 +1,12 @@
 package iskallia.ibuilders.net.connection;
 
+import iskallia.ibuilders.net.NetAddress;
 import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.Context;
 import iskallia.ibuilders.net.context.ServerContext;
 import iskallia.ibuilders.net.packet.Packet;
 import iskallia.ibuilders.net.packet.PacketHandler;
+import it.unimi.dsi.fastutil.bytes.ByteCollections;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.BufferedInputStream;
@@ -12,6 +14,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Listener extends Thread {
 
@@ -19,6 +24,7 @@ public class Listener extends Thread {
     private static int ID = 0;
 
     private Socket socket;
+    private NetAddress connectionAddress;
     private int listenerId;
 
     private DataInputStream socketInputStream;
@@ -28,8 +34,10 @@ public class Listener extends Thread {
     private Side side = Side.CLIENT;
     private ServerListener serverListener;
 
+    private List<Consumer<Listener>> connectionEstablishedConsumers = new ArrayList<>();
+
     public Listener(Socket socket) {
-        System.out.println("Connecting to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + ".");
+        this.connectionAddress = new NetAddress(socket.getInetAddress().getHostAddress(), socket.getPort());
 
         try {
             this.socket = socket;
@@ -45,7 +53,7 @@ public class Listener extends Thread {
     }
 
     public Listener(String address, int port) {
-        System.out.println("Connecting to " + address + ":" + port + ".");
+        this.connectionAddress = new NetAddress(address, port);
 
         try {
             this.socket = new Socket(address, port);
@@ -62,6 +70,10 @@ public class Listener extends Thread {
 
     public int getListenerId() {
         return this.listenerId;
+    }
+
+    public NetAddress getConnectionAddress() {
+        return this.connectionAddress;
     }
 
     public void setServer(ServerListener serverListener) {
@@ -83,9 +95,16 @@ public class Listener extends Thread {
         return null;
     }
 
+    public void onConnectionEstablished(Consumer<Listener> listenerConsumer) {
+        this.connectionEstablishedConsumers.add(listenerConsumer);
+    }
+
     private void listen() {
         if(!this.isConnected())return;
-        System.out.println("Connection established.");
+
+        for(Consumer<Listener> listenerConsumer: this.connectionEstablishedConsumers) {
+            listenerConsumer.accept(this);
+        }
 
         while(this.isConnected() && !this.socket.isClosed()) {
             String data = this.readPacket();
@@ -107,7 +126,7 @@ public class Listener extends Thread {
         return !this.shouldDisconnect;
     }
 
-    public void disconnect() {
+    public synchronized void disconnect() {
         if(!this.isConnected())return;
 
         this.shouldDisconnect = true;
@@ -120,8 +139,6 @@ public class Listener extends Thread {
 
         try {this.socket.close();}
         catch(Exception e) {;}
-
-        System.out.println("Disconnected.");
     }
 
     public void sendPacket(Packet packet) {
