@@ -1,21 +1,31 @@
 package iskallia.ibuilders.block;
 
+import com.github.lunatrius.schematica.world.schematic.SchematicFormat;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitBlock;
+import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -63,68 +73,121 @@ public class BlockMarker extends BlockDirectional {
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote && hand == EnumHand.MAIN_HAND) {
-            BlockPos closestX = closestMarkerX(world, pos);
-            BlockPos closestY = closestMarkerY(world, pos);
-            BlockPos closestZ = closestMarkerZ(world, pos);
+            int closestX = closestMarkerX(world, pos);
+            int closestY = closestMarkerY(world, pos);
+            int closestZ = closestMarkerZ(world, pos);
 
-            if (closestX == null || closestY == null || closestZ == null)
+            if (closestX == pos.getX() || closestY == pos.getY() || closestZ == pos.getZ())
                 return true;
 
-            System.out.printf("X:%s Y:%s Z:%s\n", closestX, closestY, closestZ);
+            BuildersSchematic schematic = getSchematic(world, pos, closestX, closestY, closestZ);
+            NBTTagCompound nbt = new NBTTagCompound();
+            SchematicFormat.FORMATS.get("Builders").writeToNBT(nbt, schematic);
+
+            // TODO: Remove
+            System.out.println(nbt);
+            System.out.println();
         }
 
         return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
     }
 
-    private BlockPos closestMarkerY(World world, BlockPos pos) {
-        for (int i = 1; i < Y_LIMIT; i++) {
+    public BuildersSchematic getSchematic(World world, BlockPos pos, int closestX, int closestY, int closestZ) {
+        BlockPos minPos = new BlockPos(
+                Math.min(pos.getX(), closestX),
+                Math.min(pos.getY(), closestY),
+                Math.min(pos.getZ(), closestZ));
+
+        BlockPos maxPos = new BlockPos(
+                Math.max(pos.getX(), closestX),
+                Math.max(pos.getY(), closestY),
+                Math.max(pos.getZ(), closestZ));
+
+        int width = maxPos.getX() - minPos.getX() - 1;
+        int height = maxPos.getY() - minPos.getY() + 1;
+        int length = maxPos.getZ() - minPos.getZ() - 1;
+
+        BuildersSchematic schematic = new BuildersSchematic(new ItemStack(InitBlock.MARKER), width, height, length);
+
+        // Add Blocks
+        for (int x = minPos.getX() + 1; x < maxPos.getX(); x++) {
+            for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+                for (int z = minPos.getZ() + 1; z < maxPos.getZ(); z++) {
+                    BlockPos blockPos = new BlockPos(x, y, z);
+                    BlockPos schemaPos = new BlockPos(
+                            x - minPos.getX() - 1,
+                            y - minPos.getY(),
+                            z - minPos.getZ() - 1);
+                    IBlockState blockState = world.getBlockState(blockPos);
+                    TileEntity tileEntity = world.getTileEntity(blockPos);
+                    schematic.setBlockState(schemaPos, blockState);
+                    schematic.setTileEntity(schemaPos, tileEntity);
+                }
+            }
+        }
+
+        // Add Entities
+        for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(minPos, maxPos))) {
+            if(entity instanceof EntityPlayer || entity.isCreatureType(EnumCreatureType.MONSTER, false))
+                continue;
+
+            // TODO update the entity's pos here
+            // Then add into the schematic
+//            schematic.addEntity(entity);
+        }
+
+        return schematic;
+    }
+
+    private int closestMarkerY(World world, BlockPos pos) {
+        for (int i = 1; i <= Y_LIMIT; i++) {
             BlockPos positivePos = pos.add(0, i, 0);
             BlockPos negativePos = pos.add(0, -i, 0);
 
             if (world.getBlockState(positivePos).getBlock() == InitBlock.MARKER) {
-                return positivePos;
+                return positivePos.getY();
             }
 
             if (world.getBlockState(negativePos).getBlock() == InitBlock.MARKER) {
-                return negativePos;
+                return negativePos.getY();
             }
         }
 
-        return null;
+        return pos.getY();
     }
 
-    private BlockPos closestMarkerX(World world, BlockPos pos) {
-        for (int i = 1; i < X_LIMIT; i++) {
+    private int closestMarkerX(World world, BlockPos pos) {
+        for (int i = 1; i <= X_LIMIT; i++) {
             BlockPos positivePos = pos.add(i, 0, 0);
             BlockPos negativePos = pos.add(-i, 0, 0);
 
             if (world.getBlockState(positivePos).getBlock() == InitBlock.MARKER) {
-                return positivePos;
+                return positivePos.getX();
             }
 
             if (world.getBlockState(negativePos).getBlock() == InitBlock.MARKER) {
-                return negativePos;
+                return negativePos.getX();
             }
         }
 
-        return null;
+        return pos.getX();
     }
 
-    private BlockPos closestMarkerZ(World world, BlockPos pos) {
-        for (int i = 1; i < Z_LIMIT; i++) {
+    private int closestMarkerZ(World world, BlockPos pos) {
+        for (int i = 1; i <= Z_LIMIT; i++) {
             BlockPos positivePos = pos.add(0, 0, i);
             BlockPos negativePos = pos.add(0, 0, -i);
 
             if (world.getBlockState(positivePos).getBlock() == InitBlock.MARKER) {
-                return positivePos;
+                return positivePos.getZ();
             }
 
             if (world.getBlockState(negativePos).getBlock() == InitBlock.MARKER) {
-                return negativePos;
+                return negativePos.getZ();
             }
         }
 
-        return null;
+        return pos.getZ();
     }
 
     @Nullable
