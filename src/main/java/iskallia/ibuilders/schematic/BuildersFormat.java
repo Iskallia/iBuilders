@@ -6,6 +6,8 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class BuildersFormat extends SchematicAlpha {
 
+    public static BuildersFormat INSTANCE = new BuildersFormat();
+
     @Override
     public String getName() {
         return "ibuilders.format.builders";
