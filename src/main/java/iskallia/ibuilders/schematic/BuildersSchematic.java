@@ -1,7 +1,11 @@
 package iskallia.ibuilders.schematic;
 
+import com.github.lunatrius.schematica.nbt.NBTHelper;
 import com.github.lunatrius.schematica.world.storage.Schematic;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 
 public class BuildersSchematic extends Schematic {
 
@@ -22,6 +26,19 @@ public class BuildersSchematic extends Schematic {
 
     public void setHash(int hash) {
         this.hash = hash;
+    }
+
+    @Override
+    public void setTileEntity(BlockPos pos, TileEntity tileEntity) {
+        if(tileEntity == null) {
+            super.setTileEntity(pos, null);
+            return;
+        }
+
+        NBTTagCompound tileEntityNBT = tileEntity.writeToNBT(new NBTTagCompound());
+        TileEntity schematicTE = NBTHelper.readTileEntityFromCompound(tileEntityNBT);
+        schematicTE.setPos(pos);
+        super.setTileEntity(pos, schematicTE);
     }
 
     public static class Info {

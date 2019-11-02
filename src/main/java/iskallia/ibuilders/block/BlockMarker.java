@@ -5,6 +5,7 @@ import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitBlock;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
+import iskallia.itraders.block.entity.TileEntityCryoChamber;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
@@ -77,7 +78,7 @@ public class BlockMarker extends BlockDirectional {
 
         // Add Entities
         for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(minPos, maxPos))) {
-            if(entity instanceof EntityPlayer || entity.isCreatureType(EnumCreatureType.MONSTER, false))
+            if (entity instanceof EntityPlayer || entity.isCreatureType(EnumCreatureType.MONSTER, false))
                 continue;
 
             // TODO update the entity's pos here
@@ -138,7 +139,6 @@ public class BlockMarker extends BlockDirectional {
 
         return pos.getZ();
     }
-
 
     public BlockMarker(String name) {
         super(Material.ROCK);

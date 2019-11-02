@@ -90,7 +90,7 @@ public class ItemSchema extends Item {
         ItemSchema.setSchematicNBT(heldStack, schematic);
         player.sendStatusMessage(new TextComponentTranslation("use.item_schema.success"), true);
 
-        return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
+        return EnumActionResult.SUCCESS;
     }
 
     @Override
@@ -115,6 +115,10 @@ public class ItemSchema extends Item {
             tooltip.add("Dimensions: " + width + "x" + height + "x" + length);
             tooltip.add("");
             tooltip.add("Description: " + description);
+
+            for (String mapping : schematicNBT.getCompoundTag("SchematicaMapping").getKeySet()) {
+                // TODO
+            }
 
         } else {
             tooltip.add(new TextComponentTranslation("tooltip.item_schema.empty").getFormattedText());
