@@ -11,14 +11,19 @@ public class InitBlock {
     public static BlockMarker MARKER = new BlockMarker("schema_marker");
     public static ItemBlock ITEM_MARKER = getItemBlock(MARKER);
 
+    public static BlockMarker SCHEMATIC_TERMINAL = new BlockMarker("schematic_terminal");
+    public static ItemBlock ITEM_SCHEMATIC_TERMINAL = getItemBlock(SCHEMATIC_TERMINAL);
+
     public static void registerBlocks(IForgeRegistry<Block> registry) {
         registerBlock(MARKER, registry);
+        registerBlock(SCHEMATIC_TERMINAL, registry);
     }
 
     public static void registerTileEntities() { }
 
     public static void registerItemBlocks(IForgeRegistry<Item> registry) {
         registry.register(ITEM_MARKER);
+        registry.register(ITEM_SCHEMATIC_TERMINAL);
     }
 
     /* ------------------------------------- */
