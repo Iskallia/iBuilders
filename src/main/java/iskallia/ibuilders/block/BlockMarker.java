@@ -57,7 +57,7 @@ public class BlockMarker extends BlockDirectional {
         int height = maxPos.getY() - minPos.getY() + 1;
         int length = maxPos.getZ() - minPos.getZ() - 1;
 
-        BuildersSchematic schematic = new BuildersSchematic(new ItemStack(InitBlock.MARKER), width, height, length);
+        BuildersSchematic schematic = new BuildersSchematic(width, height, length);
 
         // Add Blocks
         for (int x = minPos.getX() + 1; x < maxPos.getX(); x++) {
