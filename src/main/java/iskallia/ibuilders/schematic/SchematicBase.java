@@ -113,14 +113,7 @@ public class SchematicBase implements ISchematic {
 
     @Override
     public void removeTileEntity(final BlockPos pos) {
-        final Iterator<TileEntity> iterator = this.tileEntities.iterator();
-
-        while (iterator.hasNext()) {
-            final TileEntity tileEntity = iterator.next();
-            if (tileEntity.getPos().equals(pos)) {
-                iterator.remove();
-            }
-        }
+        this.tileEntities.removeIf(tileEntity -> tileEntity.getPos().equals(pos));
     }
 
     @Override
@@ -149,13 +142,7 @@ public class SchematicBase implements ISchematic {
             return;
         }
 
-        final Iterator<Entity> iterator = this.entities.iterator();
-        while (iterator.hasNext()) {
-            final Entity e = iterator.next();
-            if (entity.getUniqueID().equals(e.getUniqueID())) {
-                iterator.remove();
-            }
-        }
+        this.entities.removeIf(e -> entity.getUniqueID().equals(e.getUniqueID()));
     }
 
     @Override
