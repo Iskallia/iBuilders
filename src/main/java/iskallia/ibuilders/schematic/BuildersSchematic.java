@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 public class BuildersSchematic extends Schematic {
 
     private BuildersSchematic.Info info = new BuildersSchematic.Info();
+    private int hash;
 
     public BuildersSchematic(ItemStack icon, int width, int height, int length) {
         super(icon, width, height, length);
@@ -13,6 +14,14 @@ public class BuildersSchematic extends Schematic {
 
     public Info getInfo() {
         return info;
+    }
+
+    public int getHash() {
+        return hash;
+    }
+
+    public void setHash(int hash) {
+        this.hash = hash;
     }
 
     public static class Info {

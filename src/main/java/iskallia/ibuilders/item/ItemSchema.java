@@ -110,7 +110,7 @@ public class ItemSchema extends Item {
             String author = schematicNBT.getString("Author");
 
             // TODO: i18n-izify + colorize those values
-            tooltip.add("Name: " + name);
+            tooltip.add("Name: " + name + " (" + Integer.toHexString(schematicNBT.getInteger("Hash")) + ")");
             tooltip.add("By: " + author);
             tooltip.add("Dimensions: " + width + "x" + height + "x" + length);
             tooltip.add("");

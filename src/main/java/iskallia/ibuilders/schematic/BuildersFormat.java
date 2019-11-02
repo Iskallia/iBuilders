@@ -45,6 +45,9 @@ public class BuildersFormat extends SchematicAlpha {
             BuildersSchematic.Info info = buildersSchematic.getInfo();
             NBTTagCompound infoNBT = new NBTTagCompound();
 
+            // Evaluate and put hash even before the input derived from user.
+            tagCompound.setInteger("Hash", tagCompound.hashCode());
+
             if (info.getName() != null)
                 infoNBT.setString("Name", info.getName());
 
@@ -62,6 +65,8 @@ public class BuildersFormat extends SchematicAlpha {
     public ISchematic readFromNBT(NBTTagCompound tagCompound) {
         BuildersSchematic buildersSchematic = superReadFromNBT(tagCompound);
 
+        buildersSchematic.setHash(tagCompound.getInteger("Hash"));
+
         if (tagCompound.hasKey("Info", Constants.NBT.TAG_COMPOUND)) {
             NBTTagCompound infoNBT = tagCompound.getCompoundTag("Info");
 
@@ -71,7 +76,6 @@ public class BuildersFormat extends SchematicAlpha {
             if (infoNBT.hasKey("Description", Constants.NBT.TAG_STRING))
                 buildersSchematic.getInfo().setDescription(infoNBT.getString("Description"));
         }
-
 
         return buildersSchematic;
     }
