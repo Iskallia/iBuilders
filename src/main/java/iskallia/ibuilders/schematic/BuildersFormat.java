@@ -51,6 +51,7 @@ public class BuildersFormat extends SchematicAlpha {
             if (info.getDescription() != null)
                 infoNBT.setString("Description", info.getDescription());
 
+            tagCompound.setString("Author", buildersSchematic.getAuthor());
             tagCompound.setTag("Info", infoNBT);
         }
 

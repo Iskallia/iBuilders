@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -95,8 +97,24 @@ public class ItemSchema extends Item {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flagIn) {
         NBTTagCompound stackNBT = stack.getTagCompound();
 
-        if (stackNBT != null) {
-            // TODO add some info about the schema here
+        if (stackNBT != null && stackNBT.hasKey("Schematic", Constants.NBT.TAG_COMPOUND)) {
+            NBTTagCompound schematicNBT = stackNBT.getCompoundTag("Schematic");
+            NBTTagCompound infoNBT = schematicNBT.getCompoundTag("Info");
+
+            int width = schematicNBT.getShort("Width");
+            int height = schematicNBT.getShort("Height");
+            int length = schematicNBT.getShort("Length");
+
+            String name = infoNBT.getString("Name");
+            String description = infoNBT.getString("Description");
+            String author = schematicNBT.getString("Author");
+
+            // TODO: i18n-izify + colorize those values
+            tooltip.add("Name: " + name);
+            tooltip.add("By: " + author);
+            tooltip.add("Dimensions: " + width + "x" + height + "x" + length);
+            tooltip.add("");
+            tooltip.add("Description: " + description);
 
         } else {
             tooltip.add(new TextComponentTranslation("tooltip.item_schema.empty").getFormattedText());
