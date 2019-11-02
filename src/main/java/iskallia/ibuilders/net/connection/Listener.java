@@ -60,7 +60,6 @@ public class Listener extends Thread {
             this.socketInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             this.socketOutputStream = new DataOutputStream(socket.getOutputStream());
         } catch(IOException e) {
-            e.printStackTrace();
             this.disconnect();
             return;
         }

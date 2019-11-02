@@ -1,9 +1,9 @@
 package iskallia.ibuilders.event;
 
+import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.init.InitSchematic;
-import iskallia.ibuilders.net.NetworkThread;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
 
@@ -21,12 +21,13 @@ public class EventMod {
     }
 
     public static void onServerStart(FMLServerStartingEvent event) {
-        if (event.getSide().isServer()) {
+        if(event.getSide().isServer()) {
             event.getServer().setGameType(GameType.CREATIVE);
             event.getServer().setForceGamemode(true);
+            Builders.NETWORK.start();
         }
+
         event.registerServerCommand(new CommandDebugBuilders());
-        new NetworkThread().start();
     }
 
 }

@@ -14,7 +14,7 @@ public class Builders {
 
     @Mod.Instance
     private static Builders INSTANCE;
-    public boolean isOnDedicatedServer = false;
+    public static  NetworkHandler NETWORK = new NetworkHandler();
 
     public static final String MOD_ID = "ibuilders";
     public static final String MOD_NAME = "iBuilders";
@@ -22,10 +22,6 @@ public class Builders {
 
     public static Builders getInstance() {
         return INSTANCE;
-    }
-
-    public static boolean isOnDedicatedServer() {
-        return getInstance().isOnDedicatedServer;
     }
 
     @Mod.EventHandler
@@ -50,7 +46,6 @@ public class Builders {
 
     @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
-        this.isOnDedicatedServer = true;
         EventMod.onServerStart(event);
     }
 
