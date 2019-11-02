@@ -42,12 +42,16 @@ public class BuildersFormat extends SchematicAlpha {
 
         if (schematic instanceof BuildersSchematic) {
             BuildersSchematic buildersSchematic = (BuildersSchematic) schematic;
+            BuildersSchematic.Info info = buildersSchematic.getInfo();
+            NBTTagCompound infoNBT = new NBTTagCompound();
 
-            if (buildersSchematic.getName() != null)
-                tagCompound.setString("Name", buildersSchematic.getName());
+            if (info.getName() != null)
+                infoNBT.setString("Name", info.getName());
 
-            if (buildersSchematic.getDescription() != null)
-                tagCompound.setString("Description", buildersSchematic.getDescription());
+            if (info.getDescription() != null)
+                infoNBT.setString("Description", info.getDescription());
+
+            tagCompound.setTag("Info", infoNBT);
         }
 
         return result;
@@ -57,11 +61,16 @@ public class BuildersFormat extends SchematicAlpha {
     public ISchematic readFromNBT(NBTTagCompound tagCompound) {
         BuildersSchematic buildersSchematic = superReadFromNBT(tagCompound);
 
-        if (tagCompound.hasKey("Name", Constants.NBT.TAG_STRING))
-            buildersSchematic.setName(tagCompound.getString("Name"));
+        if (tagCompound.hasKey("Info", Constants.NBT.TAG_COMPOUND)) {
+            NBTTagCompound infoNBT = tagCompound.getCompoundTag("Info");
 
-        if (tagCompound.hasKey("Description", Constants.NBT.TAG_STRING))
-            buildersSchematic.setDescription(tagCompound.getString("Description"));
+            if (infoNBT.hasKey("Name", Constants.NBT.TAG_STRING))
+                buildersSchematic.getInfo().setName(infoNBT.getString("Name"));
+
+            if (infoNBT.hasKey("Description", Constants.NBT.TAG_STRING))
+                buildersSchematic.getInfo().setDescription(infoNBT.getString("Description"));
+        }
+
 
         return buildersSchematic;
     }

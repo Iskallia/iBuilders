@@ -11,7 +11,11 @@ public class BuildersSchematic extends Schematic {
         super(icon, width, height, length);
     }
 
-    public class Info {
+    public Info getInfo() {
+        return info;
+    }
+
+    public static class Info {
         private String name;
         private String description;
 

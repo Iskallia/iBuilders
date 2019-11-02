@@ -82,8 +82,8 @@ public class ItemSchema extends Item {
 
         BuildersSchematic schematic = BlockMarker.getSchematic(world, pos, closestX, closestY, closestZ);
         schematic.setAuthor(player.getName());
-        schematic.setName("TEST BUILD SCHEME"); // TODO
-        schematic.setDescription("TEST DESCRIPTION"); // TODO
+        schematic.getInfo().setName("TEST BUILD SCHEME"); // TODO
+        schematic.getInfo().setDescription("TEST DESCRIPTION"); // TODO
 
         ItemSchema.setSchematicNBT(heldStack, schematic);
         player.sendStatusMessage(new TextComponentTranslation("use.item_schema.success"), true);
