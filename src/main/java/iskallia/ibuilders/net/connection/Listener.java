@@ -5,8 +5,7 @@ import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.Context;
 import iskallia.ibuilders.net.context.ServerContext;
 import iskallia.ibuilders.net.packet.Packet;
-import iskallia.ibuilders.net.packet.PacketHandler;
-import it.unimi.dsi.fastutil.bytes.ByteCollections;
+import iskallia.ibuilders.net.packet.util.PacketHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.BufferedInputStream;

@@ -1,5 +1,7 @@
 package iskallia.ibuilders.net.packet;
 
+import iskallia.ibuilders.net.packet.util.C2SMessage;
+import iskallia.ibuilders.net.packet.util.S2CMessage;
 import net.minecraftforge.fml.relauncher.Side;
 
 public abstract class Packet {

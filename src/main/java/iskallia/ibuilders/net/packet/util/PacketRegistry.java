@@ -1,4 +1,6 @@
-package iskallia.ibuilders.net.packet;
+package iskallia.ibuilders.net.packet.util;
+
+import iskallia.ibuilders.net.packet.Packet;
 
 import java.util.ArrayList;
 import java.util.List;

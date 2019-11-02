@@ -4,6 +4,7 @@ import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.net.NetAddress;
 import iskallia.ibuilders.net.connection.Listener;
 import iskallia.ibuilders.net.connection.ServerListener;
+import iskallia.ibuilders.net.packet.Packet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,18 @@ public class NetworkHandler {
         }
 
         this.time++;
+    }
+
+    public ServerListener getServerListener() {
+        return this.serverListener;
+    }
+
+    public void sendToAllPlotServers(Packet packet) {
+        this.listeners.removeIf(listener -> !listener.isConnected());
+
+        this.listeners.forEach(listener -> {
+            listener.sendPacket(packet);
+        });
     }
 
     private void startPlotServerListener() {

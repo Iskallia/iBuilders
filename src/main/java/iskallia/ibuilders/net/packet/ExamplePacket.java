@@ -2,6 +2,8 @@ package iskallia.ibuilders.net.packet;
 
 import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.ServerContext;
+import iskallia.ibuilders.net.packet.util.C2SMessage;
+import iskallia.ibuilders.net.packet.util.S2CMessage;
 
 import java.util.Calendar;
 

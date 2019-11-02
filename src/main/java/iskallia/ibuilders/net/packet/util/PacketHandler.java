@@ -1,10 +1,11 @@
-package iskallia.ibuilders.net.packet;
+package iskallia.ibuilders.net.packet.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.Context;
 import iskallia.ibuilders.net.context.ServerContext;
+import iskallia.ibuilders.net.packet.Packet;
 
 public class PacketHandler {
 
