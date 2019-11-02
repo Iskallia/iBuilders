@@ -4,6 +4,7 @@ import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.init.InitSchematic;
+import iskallia.ibuilders.net.context.ServerContext;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
 
@@ -25,6 +26,14 @@ public class EventMod {
             event.getServer().setGameType(GameType.CREATIVE);
             event.getServer().setForceGamemode(true);
             Builders.NETWORK.start();
+
+            if(Builders.NETWORK.hasServerListener()) {
+                Builders.NETWORK.getServerListener().onContextCreated(context -> {
+                    if(context instanceof ServerContext) {
+                        ((ServerContext)context).minecraftServer = event.getServer();
+                    }
+                });
+            }
         }
 
         event.registerServerCommand(new CommandDebugBuilders());

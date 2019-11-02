@@ -1,7 +1,9 @@
 package iskallia.ibuilders.net.connection;
 
+import iskallia.ibuilders.net.context.Context;
 import iskallia.ibuilders.net.packet.Packet;
 
+import javax.management.AttributeList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.*;
@@ -16,6 +18,7 @@ public class ServerListener extends Thread {
     private Map<Integer, Listener> listeners = new HashMap<>();
 
     private List<Consumer<Listener>> connectionEstablishedConsumers = new ArrayList<>();
+    private List<Consumer<Context>> contextCreatedConsumers = new ArrayList<>();
 
     public ServerListener(int port) {
         try {
@@ -30,6 +33,7 @@ public class ServerListener extends Thread {
         try {
             while(this.isConnected() && !serverSocket.isClosed()) {
                 Listener listener = new Listener(serverSocket.accept());
+                this.contextCreatedConsumers.forEach(listener::onContextCreated);
                 listener.setServer(this);
                 listener.start();
 
@@ -51,6 +55,10 @@ public class ServerListener extends Thread {
 
     public void onConnectionEstablished(Consumer<Listener> listenerConsumer) {
         this.connectionEstablishedConsumers.add(listenerConsumer);
+    }
+
+    public void onContextCreated(Consumer<Context> contextConsumer) {
+        this.contextCreatedConsumers.add(contextConsumer);
     }
 
     public boolean isConnected() {

@@ -38,6 +38,10 @@ public class NetworkHandler {
         this.time++;
     }
 
+    public boolean hasServerListener() {
+        return this.serverListener != null;
+    }
+
     public ServerListener getServerListener() {
         return this.serverListener;
     }

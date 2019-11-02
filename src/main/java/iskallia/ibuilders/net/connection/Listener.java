@@ -8,6 +8,7 @@ import iskallia.ibuilders.net.packet.Packet;
 import iskallia.ibuilders.net.packet.util.PacketHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
+import javax.management.AttributeList;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,6 +35,7 @@ public class Listener extends Thread {
     private ServerListener serverListener;
 
     private List<Consumer<Listener>> connectionEstablishedConsumers = new ArrayList<>();
+    private List<Consumer<Context>> contextCreatedConsumers = new ArrayList<>();
 
     public Listener(Socket socket) {
         this.connectionAddress = new NetAddress(socket.getInetAddress().getHostAddress(), socket.getPort());
@@ -82,11 +84,13 @@ public class Listener extends Thread {
     private Context getContext() {
         if(this.side == Side.CLIENT) {
             ClientContext clientContext = new ClientContext();
+            this.contextCreatedConsumers.forEach(contextConsumer -> contextConsumer.accept(clientContext));
             return clientContext;
         } else if(this.side == Side.SERVER) {
             ServerContext serverContext = new ServerContext();
             serverContext.serverListener = this.serverListener;
             serverContext.listener = this;
+            this.contextCreatedConsumers.forEach(contextConsumer -> contextConsumer.accept(serverContext));
             return serverContext;
         }
 
@@ -95,6 +99,10 @@ public class Listener extends Thread {
 
     public void onConnectionEstablished(Consumer<Listener> listenerConsumer) {
         this.connectionEstablishedConsumers.add(listenerConsumer);
+    }
+
+    public void onContextCreated(Consumer<Context> contextConsumer) {
+        this.contextCreatedConsumers.add(contextConsumer);
     }
 
     private void listen() {
