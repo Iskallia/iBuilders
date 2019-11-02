@@ -41,58 +41,7 @@ public class BlockMarker extends BlockDirectional {
     protected static final AxisAlignedBB NS_AABB = new AxisAlignedBB(0.375D, 0.375D, 0.0D, 0.625D, 0.625D, 1.0D);
     protected static final AxisAlignedBB EW_AABB = new AxisAlignedBB(0.0D, 0.375D, 0.375D, 1.0D, 0.625D, 0.625D);
 
-    public BlockMarker(String name) {
-        super(Material.ROCK);
-
-        this.setUnlocalizedName(name);
-        this.setRegistryName(Builders.getResource(name));
-
-        this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
-    }
-
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        switch (((EnumFacing) state.getValue(FACING)).getAxis()) {
-            case X:
-            default:
-                return EW_AABB;
-            case Z:
-                return NS_AABB;
-            case Y:
-                return VERTICAL_AABB;
-        }
-    }
-
-    public IBlockState withRotation(IBlockState state, Rotation rot) {
-        return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
-    }
-
-    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
-        return state.withProperty(FACING, mirrorIn.mirror((EnumFacing) state.getValue(FACING)));
-    }
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!world.isRemote && hand == EnumHand.MAIN_HAND) {
-            int closestX = closestMarkerX(world, pos);
-            int closestY = closestMarkerY(world, pos);
-            int closestZ = closestMarkerZ(world, pos);
-
-            if (closestX == pos.getX() || closestY == pos.getY() || closestZ == pos.getZ())
-                return true;
-
-            BuildersSchematic schematic = getSchematic(world, pos, closestX, closestY, closestZ);
-            NBTTagCompound nbt = new NBTTagCompound();
-            SchematicFormat.FORMATS.get("Builders").writeToNBT(nbt, schematic);
-
-            // TODO: Remove
-            System.out.println(nbt);
-            System.out.println();
-        }
-
-        return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
-    }
-
-    public BuildersSchematic getSchematic(World world, BlockPos pos, int closestX, int closestY, int closestZ) {
+    public static BuildersSchematic getSchematic(World world, BlockPos pos, int closestX, int closestY, int closestZ) {
         BlockPos minPos = new BlockPos(
                 Math.min(pos.getX(), closestX),
                 Math.min(pos.getY(), closestY),
@@ -139,7 +88,7 @@ public class BlockMarker extends BlockDirectional {
         return schematic;
     }
 
-    private int closestMarkerY(World world, BlockPos pos) {
+    public static int closestMarkerY(World world, BlockPos pos) {
         for (int i = 1; i <= Y_LIMIT; i++) {
             BlockPos positivePos = pos.add(0, i, 0);
             BlockPos negativePos = pos.add(0, -i, 0);
@@ -156,7 +105,7 @@ public class BlockMarker extends BlockDirectional {
         return pos.getY();
     }
 
-    private int closestMarkerX(World world, BlockPos pos) {
+    public static int closestMarkerX(World world, BlockPos pos) {
         for (int i = 1; i <= X_LIMIT; i++) {
             BlockPos positivePos = pos.add(i, 0, 0);
             BlockPos negativePos = pos.add(-i, 0, 0);
@@ -173,7 +122,7 @@ public class BlockMarker extends BlockDirectional {
         return pos.getX();
     }
 
-    private int closestMarkerZ(World world, BlockPos pos) {
+    public static int closestMarkerZ(World world, BlockPos pos) {
         for (int i = 1; i <= Z_LIMIT; i++) {
             BlockPos positivePos = pos.add(0, 0, i);
             BlockPos negativePos = pos.add(0, 0, -i);
@@ -188,6 +137,45 @@ public class BlockMarker extends BlockDirectional {
         }
 
         return pos.getZ();
+    }
+
+
+    public BlockMarker(String name) {
+        super(Material.ROCK);
+
+        this.setUnlocalizedName(name);
+        this.setRegistryName(Builders.getResource(name));
+
+        this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
+    }
+
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        switch (((EnumFacing) state.getValue(FACING)).getAxis()) {
+            case X:
+            default:
+                return EW_AABB;
+            case Z:
+                return NS_AABB;
+            case Y:
+                return VERTICAL_AABB;
+        }
+    }
+
+    public IBlockState withRotation(IBlockState state, Rotation rot) {
+        return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
+    }
+
+    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
+        return state.withProperty(FACING, mirrorIn.mirror((EnumFacing) state.getValue(FACING)));
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote && hand == EnumHand.MAIN_HAND) {
+            // TODO: toggle marker lasers (?)
+        }
+
+        return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
     }
 
     @Nullable

@@ -2,6 +2,7 @@ package iskallia.ibuilders.event;
 
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitBlock;
+import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.init.InitModel;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -21,6 +22,7 @@ public class EventRegistry {
 
     @SubscribeEvent
     public static void onItemRegister(RegistryEvent.Register<Item> event) {
+        InitItem.registerItems(event.getRegistry());
         InitBlock.registerItemBlocks(event.getRegistry());
     }
 

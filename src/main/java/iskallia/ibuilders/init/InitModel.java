@@ -10,6 +10,8 @@ import net.minecraftforge.client.model.ModelLoader;
 public class InitModel {
 
     public static void registerItemModels() {
+        registerSimpleItemModel(InitItem.SCHEMA, 0);
+
         registerSimpleItemModel(InitBlock.ITEM_MARKER, 0);
     }
 

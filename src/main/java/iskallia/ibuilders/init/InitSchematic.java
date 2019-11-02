@@ -6,7 +6,7 @@ import iskallia.ibuilders.schematic.BuildersFormat;
 public class InitSchematic {
 
     public static void registerSchematics() {
-        SchematicFormat.FORMATS.put("Builders", new BuildersFormat());
+        SchematicFormat.FORMATS.put("Builders", BuildersFormat.INSTANCE);
     }
 
 }
