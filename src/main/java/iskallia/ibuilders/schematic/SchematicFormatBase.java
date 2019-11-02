@@ -30,6 +30,8 @@ import java.util.Set;
 
 public abstract class SchematicFormatBase extends SchematicFormat {
 
+    protected abstract String getMaterialsName();
+
     @Override
     public BuildersSchematic readFromNBT(final NBTTagCompound tagCompound) {
         final byte[] localBlocks = tagCompound.getByteArray(Names.NBT.BLOCKS);
@@ -191,7 +193,7 @@ public abstract class SchematicFormatBase extends SchematicFormat {
             nbtMapping.setShort(entry.getKey(), entry.getValue());
         }
 
-        tagCompound.setString(Names.NBT.MATERIALS, Names.NBT.FORMAT_ALPHA);
+        tagCompound.setString(Names.NBT.MATERIALS, getMaterialsName());
         tagCompound.setByteArray(Names.NBT.BLOCKS, localBlocks);
         tagCompound.setByteArray(Names.NBT.DATA, localMetadata);
         if (extra) {

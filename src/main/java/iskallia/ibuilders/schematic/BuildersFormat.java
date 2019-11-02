@@ -1,16 +1,23 @@
 package iskallia.ibuilders.schematic;
 
 import com.github.lunatrius.schematica.api.ISchematic;
+import com.github.lunatrius.schematica.reference.Names;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
 
 public class BuildersFormat extends SchematicFormatBase {
 
     public static BuildersFormat INSTANCE = new BuildersFormat();
+    public static String MATERIALS_VALUE = "iBuilders";
 
     @Override
     public String getName() {
         return "ibuilders.format.builders";
+    }
+
+    @Override
+    protected String getMaterialsName() {
+        return MATERIALS_VALUE;
     }
 
     @Override
