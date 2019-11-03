@@ -5,7 +5,6 @@ import iskallia.ibuilders.net.connection.Listener;
 import iskallia.ibuilders.net.context.ServerContext;
 import iskallia.ibuilders.net.packet.util.C2SMessage;
 import iskallia.ibuilders.net.packet.util.PacketRegistry;
-import org.jline.utils.Log;
 
 import java.util.List;
 
