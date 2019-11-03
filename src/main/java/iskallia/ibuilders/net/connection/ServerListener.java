@@ -21,6 +21,8 @@ public class ServerListener extends Thread {
     private List<Consumer<Context>> contextCreatedConsumers = new ArrayList<>();
 
     public ServerListener(int port) {
+        this.setName("[iBuilders] Server Listener");
+
         try {
             this.serverSocket = new ServerSocket(port);
         } catch(IOException e) {
@@ -34,13 +36,11 @@ public class ServerListener extends Thread {
             while(this.isConnected() && !serverSocket.isClosed()) {
                 Listener listener = new Listener(serverSocket.accept());
                 this.contextCreatedConsumers.forEach(listener::onContextCreated);
+                this.connectionEstablishedConsumers.forEach(listener::onConnectionEstablished);
                 listener.setServer(this);
                 listener.start();
 
-                if(listener.isConnected()) {
-                    this.listeners.put(listener.getListenerId(), listener);
-                    this.connectionEstablishedConsumers.forEach(listenerConsumer -> listenerConsumer.accept(listener));
-                }
+                this.listeners.put(listener.getListenerId(), listener);
 
                 this.listeners = this.listeners.entrySet().stream()
                         .filter(entry -> entry.getValue().isConnected())

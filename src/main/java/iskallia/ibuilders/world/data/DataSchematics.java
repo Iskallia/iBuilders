@@ -59,6 +59,14 @@ public class DataSchematics extends WorldSavedData {
         return null;
     }
 
+    public void addSchematic(String playerUuid, BuildersSchematic schematic) {
+        if(!this.schematicsMap.containsKey(playerUuid)) {
+            this.schematicsMap.put(playerUuid, Lists.newArrayList());
+        }
+
+        this.schematicsMap.get(playerUuid).add(schematic);
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         NBTTagList schematicEntries = nbt.getTagList("SchematicEntries", Constants.NBT.TAG_COMPOUND);
