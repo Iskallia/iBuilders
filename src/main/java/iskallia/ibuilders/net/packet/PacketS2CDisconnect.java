@@ -20,6 +20,8 @@ public class PacketS2CDisconnect extends Packet implements S2CMessage {
     public Packet onPacketReceived(ClientContext context) {
         Builders.LOG.error("Disconnecting from plot server [" + context.listener.getConnectionAddress()
                 + "] for reason: " + this.reason + ".");
+
+        context.listener.disconnect();
         return null;
     }
 

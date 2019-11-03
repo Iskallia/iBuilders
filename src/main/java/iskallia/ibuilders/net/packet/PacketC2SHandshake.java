@@ -35,6 +35,8 @@ public class PacketC2SHandshake extends Packet implements C2SMessage {
             //Send the packet first, disconnect later.
             context.minecraftServer.addScheduledTask(listener::disconnect);
             return new PacketS2CDisconnect(PacketS2CDisconnect.Reason.INVALID_PROTOCOL);
+        } else {
+            Builders.LOG.warn("Handshake with main server [" + listener.getConnectionAddress() + "] was successful!");
         }
 
         return null;

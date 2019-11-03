@@ -5,6 +5,7 @@ import iskallia.ibuilders.net.NetAddress;
 import iskallia.ibuilders.net.connection.Listener;
 import iskallia.ibuilders.net.connection.ServerListener;
 import iskallia.ibuilders.net.packet.Packet;
+import iskallia.ibuilders.net.packet.PacketC2SHandshake;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +89,8 @@ public class NetworkHandler {
                 Builders.LOG.warn("Attempting to connect to plot server [" + listener.getConnectionAddress() + "]...");
 
                 listener.onConnectionEstablished(connectedListener -> {
-                    Builders.LOG.warn("Successfully connected to plot server [" + listener.getConnectionAddress() + "]!");
+                    Builders.LOG.warn("Successfully connected to plot server [" + connectedListener.getConnectionAddress() + "]!");
+                    connectedListener.sendPacket(new PacketC2SHandshake());
                 });
 
                 this.listeners.add(listener);
