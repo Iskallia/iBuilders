@@ -6,6 +6,7 @@ import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.init.InitModel;
 import iskallia.ibuilders.init.InitPacket;
 import iskallia.ibuilders.init.InitSchematic;
+import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.ServerContext;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
@@ -42,6 +43,8 @@ public class EventMod {
                 Builders.NETWORK.getServerListener().onContextCreated(context -> {
                     if(context instanceof ServerContext) {
                         ((ServerContext)context).minecraftServer = event.getServer();
+                    } else if(context instanceof ClientContext) {
+                        ((ClientContext)context).minecraftServer = event.getServer();
                     }
                 });
             }
