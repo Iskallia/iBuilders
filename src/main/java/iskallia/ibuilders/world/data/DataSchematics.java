@@ -36,18 +36,15 @@ public class DataSchematics extends WorldSavedData {
         return infoList;
     }
 
-    public List<BuildersSchematic> getSchematicsFor(EntityPlayer player) {
-        String key = player.getUniqueID().toString();
-        if(!this.schematicsMap.containsKey(key))return Lists.newArrayList();
-        return this.schematicsMap.get(key);
+    public List<BuildersSchematic> getSchematicsFor(String playerUuid) {
+        if(!this.schematicsMap.containsKey(playerUuid))return Lists.newArrayList();
+        return this.schematicsMap.get(playerUuid);
     }
 
     @Nullable
-    public BuildersSchematic getSchematic(EntityPlayer player, String name) {
-        String key = player.getUniqueID().toString();
-
-        if(!this.schematicsMap.containsKey(key))return null;
-        List<BuildersSchematic> schematics = this.schematicsMap.get(player.getUniqueID().toString());
+    public BuildersSchematic getSchematic(String playerUuid, String name) {
+        if(!this.schematicsMap.containsKey(playerUuid))return null;
+        List<BuildersSchematic> schematics = this.schematicsMap.get(playerUuid);
 
         if(schematics == null || schematics.isEmpty()) {
             return null;

@@ -9,20 +9,22 @@ import iskallia.ibuilders.world.data.DataSchematics;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 
-import java.util.List;
+public class PacketRequestSchematic extends Packet implements C2SMessage, S2CMessage {
 
-public class PacketRequestSchemaInfo extends Packet implements C2SMessage, S2CMessage {
+    private String playerUuid;
+    private String name;
+    private BuildersSchematic schematic;
 
-    private List<BuildersSchematic.Info> infoList;
-
-    //Use this constructor on the live server, to request a list of all schematic names, authors and descriptions.
-    public PacketRequestSchemaInfo() {
-        this.infoList = null;
+    public PacketRequestSchematic(String playerUuid, String name) {
+        this.playerUuid = playerUuid;
+        this.name = name;
+        this.schematic = null;
     }
 
-    //Use this constructor on the plot server, to send a list of all schematic names, authors and descriptions.
-    private PacketRequestSchemaInfo(List<BuildersSchematic.Info> infoList) {
-        this.infoList = infoList;
+    private PacketRequestSchematic(String playerUuid, String name, BuildersSchematic schematic) {
+        this.playerUuid = playerUuid;
+        this.name = name;
+        this.schematic = schematic;
     }
 
     //On received on the plot server.
@@ -30,13 +32,14 @@ public class PacketRequestSchemaInfo extends Packet implements C2SMessage, S2CMe
     public Packet onPacketReceived(ServerContext context) {
         World overworld = context.minecraftServer.worlds[DimensionType.OVERWORLD.getId()];
         DataSchematics dataSchematics = DataSchematics.get(overworld);
-        return new PacketRequestSchemaInfo(dataSchematics.getAllInfo());
+        BuildersSchematic schematic = dataSchematics.getSchematic(this.playerUuid, this.name);
+        return new PacketRequestSchematic(this.playerUuid, this.name, schematic);
     }
 
     //On received on the live server.
     @Override
     public Packet onPacketReceived(ClientContext context) {
-        //Sync infoList to GUI?
+        //Sync schematic to container?
         return null;
     }
 }
