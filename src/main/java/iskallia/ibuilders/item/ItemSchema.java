@@ -27,6 +27,7 @@ import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemSchema extends Item {
@@ -111,17 +112,43 @@ public class ItemSchema extends Item {
             tooltip.add("By: " + author);
             tooltip.add("Dimensions: " + width + "x" + height + "x" + length);
             tooltip.add("");
-            tooltip.add("Description: " + description);
 
-            for (String mapping : schematicNBT.getCompoundTag("SchematicaMapping").getKeySet()) {
-                // TODO
+            tooltip.add("Contents:");
+            byte[] blocks = schematicNBT.getByteArray("Blocks");
+            NBTTagCompound schematicaMapping = schematicNBT.getCompoundTag("SchematicaMapping");
+            int i = 0;
+            for (String mapping : schematicaMapping.getKeySet()) {
+                if (i >= 3) {
+                    tooltip.add("...");
+                    break;
+                }
+
+                short id = schematicaMapping.getShort(mapping);
+
+                if (id == 0) continue;
+
+                tooltip.add(countOf(blocks, id) + " x " + mapping);
+                i++;
             }
+
+            tooltip.add("");
+            tooltip.add("Description: " + description);
 
         } else {
             tooltip.add(new TextComponentTranslation("tooltip.item_schema.empty").getFormattedText());
         }
 
         super.addInformation(stack, world, tooltip, flagIn);
+    }
+
+    // TODO: Extract to other place, will be used by the Creator block as well!
+    private int countOf(byte[] list, short id) {
+        int count = 0;
+        for (byte item : list) {
+            if (new Byte(item).shortValue() == new Short(id).byteValue()) // ? :c
+                count++;
+        }
+        return count;
     }
 
 }
