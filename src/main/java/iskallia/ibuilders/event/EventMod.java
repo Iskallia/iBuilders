@@ -3,16 +3,22 @@ package iskallia.ibuilders.event;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.init.InitConfig;
+import iskallia.ibuilders.init.InitModel;
 import iskallia.ibuilders.init.InitSchematic;
 import iskallia.ibuilders.net.context.ServerContext;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class EventMod {
 
     public static void onConstruction(FMLConstructionEvent event) { }
 
-    public static void onPreInitialization(FMLPreInitializationEvent event) { }
+    public static void onPreInitialization(FMLPreInitializationEvent event) {
+        if(event.getSide() == Side.CLIENT) {
+            InitModel.registerTileEntityRenderers();
+        }
+    }
 
     public static void onInitialization(FMLInitializationEvent event) { }
 

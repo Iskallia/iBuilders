@@ -2,6 +2,7 @@ package iskallia.ibuilders.item;
 
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.BlockMarker;
+import iskallia.ibuilders.block.entity.TileEntityMarker;
 import iskallia.ibuilders.init.InitBlock;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.schematic.BuildersFormat;
@@ -14,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -23,6 +25,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -50,39 +53,33 @@ public class ItemSchema extends Item {
         this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
     }
 
+    @Nonnull
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (world.isRemote) return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
 
         ItemStack heldStack = player.getHeldItem(hand);
-
         Block clickedBlock = world.getBlockState(pos).getBlock();
+        TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, pos);
 
         if (clickedBlock != InitBlock.MARKER) {
             player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.not_marker"), true);
             return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
         }
 
-        int closestX = BlockMarker.closestMarkerX(world, pos);
-        int closestY = BlockMarker.closestMarkerY(world, pos);
-        int closestZ = BlockMarker.closestMarkerZ(world, pos);
-
-        if (closestX == pos.getX()) {
-            player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.invalid_pos", "X"), true);
+        if (markerTileEntity == null || markerTileEntity.isUnset()) {
+            player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.not_connected"), true);
             return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
         }
 
-        if (closestY == pos.getY()) {
-            player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.invalid_pos", "Y"), true);
-            return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
-        }
+        TileEntityMarker masterTileEntity = markerTileEntity.getMaster();
+        int closestX = masterTileEntity.getExtensionX().getX();
+        int closestY = masterTileEntity.getExtensionY().getY();
+        int closestZ = masterTileEntity.getExtensionZ().getZ();
 
-        if (closestZ == pos.getZ()) {
-            player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.invalid_pos", "Z"), true);
-            return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
-        }
-
-        BuildersSchematic schematic = BlockMarker.getSchematic(world, pos, closestX, closestY, closestZ);
+        BuildersSchematic schematic = BlockMarker.getSchematic(world,
+                masterTileEntity.getPos(),
+                closestX, closestY, closestZ);
         schematic.setAuthor(player.getName());
         schematic.getInfo().setName("TEST BUILD SCHEME"); // TODO
         schematic.getInfo().setDescription("TEST DESCRIPTION"); // TODO

@@ -1,35 +1,31 @@
 package iskallia.ibuilders.block;
 
-import com.github.lunatrius.schematica.world.schematic.SchematicFormat;
 import iskallia.ibuilders.Builders;
+import iskallia.ibuilders.block.entity.TileEntityMarker;
 import iskallia.ibuilders.init.InitBlock;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
-import iskallia.itraders.block.entity.TileEntityCryoChamber;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlockMarker extends BlockDirectional {
@@ -41,6 +37,168 @@ public class BlockMarker extends BlockDirectional {
     protected static final AxisAlignedBB VERTICAL_AABB = new AxisAlignedBB(0.375D, 0.0D, 0.375D, 0.625D, 1.0D, 0.625D);
     protected static final AxisAlignedBB NS_AABB = new AxisAlignedBB(0.375D, 0.375D, 0.0D, 0.625D, 0.625D, 1.0D);
     protected static final AxisAlignedBB EW_AABB = new AxisAlignedBB(0.0D, 0.375D, 0.375D, 1.0D, 0.625D, 0.625D);
+
+    public BlockMarker(String name) {
+        super(Material.ROCK);
+
+        this.setUnlocalizedName(name);
+        this.setRegistryName(Builders.getResource(name));
+
+        this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
+    }
+
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        switch (((EnumFacing) state.getValue(FACING)).getAxis()) {
+            case X:
+            default:
+                return EW_AABB;
+            case Z:
+                return NS_AABB;
+            case Y:
+                return VERTICAL_AABB;
+        }
+    }
+
+    public IBlockState withRotation(IBlockState state, Rotation rot) {
+        return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
+    }
+
+    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
+        return state.withProperty(FACING, mirrorIn.mirror((EnumFacing) state.getValue(FACING)));
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote && hand == EnumHand.MAIN_HAND && player.getHeldItem(hand).isEmpty()) {
+            TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, pos);
+
+            if (markerTileEntity == null)
+                return false;
+
+            if (player.isSneaking() && markerTileEntity.isUnset()) {
+                int closestX = BlockMarker.closestMarkerX(world, pos);
+                int closestY = BlockMarker.closestMarkerY(world, pos);
+                int closestZ = BlockMarker.closestMarkerZ(world, pos);
+
+                if (closestX == pos.getX()) {
+                    player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.invalid_pos", "X"), true);
+                    return false;
+                }
+
+                if (closestY == pos.getY()) {
+                    player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.invalid_pos", "Y"), true);
+                    return false;
+                }
+
+                if (closestZ == pos.getZ()) {
+                    player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.invalid_pos", "Z"), true);
+                    return false;
+                }
+
+                boolean success = markerTileEntity.setExtensions(closestX, closestY, closestZ);
+
+                player.sendStatusMessage(new TextComponentTranslation(
+                        success ? "use.block_marker.success" : "use.block_marker.failure"), true);
+
+
+            } else if (player.isSneaking() && markerTileEntity.isMaster()) {
+                markerTileEntity.destroyNetwork();
+                player.sendStatusMessage(new TextComponentTranslation("use.block_marker.disconnected"), true);
+
+            } else if (!player.isSneaking()) {
+                // TODO: Remove. Here only for DEBUG purposes
+                System.out.printf("\n%s\nisMaster:%s, isExtension:%s, isUnset:%s\n",
+                        markerTileEntity,
+                        markerTileEntity.isMaster(),
+                        markerTileEntity.isExtension(),
+                        markerTileEntity.isUnset());
+            }
+        }
+
+        return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
+    }
+
+    @Override
+    public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+        if (!world.isRemote) {
+            TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, pos);
+
+            if (markerTileEntity != null)
+                markerTileEntity.destroyNetwork();
+        }
+
+        super.onBlockHarvested(world, pos, state, player);
+    }
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return NULL_AABB;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        return true;
+    }
+
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        IBlockState iblockstate = worldIn.getBlockState(pos.offset(facing.getOpposite()));
+
+        if (iblockstate.getBlock() == Blocks.END_ROD) {
+            EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
+
+            if (enumfacing == facing) {
+                return this.getDefaultState().withProperty(FACING, facing.getOpposite());
+            }
+        }
+
+        return this.getDefaultState().withProperty(FACING, facing);
+    }
+
+    public IBlockState getStateFromMeta(int meta) {
+        IBlockState iblockstate = this.getDefaultState();
+        iblockstate = iblockstate.withProperty(FACING, EnumFacing.getFront(meta));
+        return iblockstate;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
+
+    public int getMetaFromState(IBlockState state) {
+        return ((EnumFacing) state.getValue(FACING)).getIndex();
+    }
+
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, FACING);
+    }
+
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+        return BlockFaceShape.UNDEFINED;
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
+        return new TileEntityMarker();
+    }
 
     public static BuildersSchematic getSchematic(World world, BlockPos pos, int closestX, int closestY, int closestZ) {
         BlockPos minPos = new BlockPos(
@@ -138,103 +296,6 @@ public class BlockMarker extends BlockDirectional {
         }
 
         return pos.getZ();
-    }
-
-    public BlockMarker(String name) {
-        super(Material.ROCK);
-
-        this.setUnlocalizedName(name);
-        this.setRegistryName(Builders.getResource(name));
-
-        this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
-    }
-
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        switch (((EnumFacing) state.getValue(FACING)).getAxis()) {
-            case X:
-            default:
-                return EW_AABB;
-            case Z:
-                return NS_AABB;
-            case Y:
-                return VERTICAL_AABB;
-        }
-    }
-
-    public IBlockState withRotation(IBlockState state, Rotation rot) {
-        return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
-    }
-
-    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
-        return state.withProperty(FACING, mirrorIn.mirror((EnumFacing) state.getValue(FACING)));
-    }
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!world.isRemote && hand == EnumHand.MAIN_HAND) {
-            // TODO: toggle marker lasers (?)
-        }
-
-        return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
-    }
-
-    @Nullable
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return NULL_AABB;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-        return true;
-    }
-
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        IBlockState iblockstate = worldIn.getBlockState(pos.offset(facing.getOpposite()));
-
-        if (iblockstate.getBlock() == Blocks.END_ROD) {
-            EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
-
-            if (enumfacing == facing) {
-                return this.getDefaultState().withProperty(FACING, facing.getOpposite());
-            }
-        }
-
-        return this.getDefaultState().withProperty(FACING, facing);
-    }
-
-    public IBlockState getStateFromMeta(int meta) {
-        IBlockState iblockstate = this.getDefaultState();
-        iblockstate = iblockstate.withProperty(FACING, EnumFacing.getFront(meta));
-        return iblockstate;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
-
-    public int getMetaFromState(IBlockState state) {
-        return ((EnumFacing) state.getValue(FACING)).getIndex();
-    }
-
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING);
-    }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-        return BlockFaceShape.UNDEFINED;
     }
 
 }

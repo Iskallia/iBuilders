@@ -5,7 +5,11 @@ tile.schema_marker.name=Schema Marker
 item.item_schema.name=Schema
 
 use.item_schema.fail.not_marker=§4Need to use on a Schema Marker!
-use.item_schema.fail.invalid_pos=§4Schema Markers missing @ %1$s-axis!
+use.item_schema.fail.not_connected=§4This Marker is not connected yet!
 use.item_schema.success=§aSuccessfully exported Schema!
+
+use.block_marker.success=§aSuccessfully connected markers!
+use.block_marker.failure=§4Failed to connect markers..
+use.block_marker.disconnected=§3Disconnected markers
 
 tooltip.item_schema.empty=§8No block data saved yet.

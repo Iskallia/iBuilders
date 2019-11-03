@@ -1,11 +1,14 @@
 package iskallia.ibuilders.init;
 
 import iskallia.ibuilders.Builders;
+import iskallia.ibuilders.block.entity.TileEntityMarker;
+import iskallia.ibuilders.block.render.TESRMarker;
 import iskallia.itraders.Traders;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class InitModel {
 
@@ -19,7 +22,9 @@ public class InitModel {
         registerBlockModel(InitBlock.MARKER, 0);
     }
 
-    public static void registerTileEntityRenderers() {}
+    public static void registerTileEntityRenderers() {
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMarker.class, new TESRMarker());
+    }
 
     /* ---------------------------------- */
 

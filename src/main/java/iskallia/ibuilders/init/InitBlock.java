@@ -1,9 +1,12 @@
 package iskallia.ibuilders.init;
 
+import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.BlockMarker;
+import iskallia.ibuilders.block.entity.TileEntityMarker;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class InitBlock {
@@ -19,7 +22,9 @@ public class InitBlock {
         registerBlock(SCHEMATIC_TERMINAL, registry);
     }
 
-    public static void registerTileEntities() { }
+    public static void registerTileEntities() {
+        GameRegistry.registerTileEntity(TileEntityMarker.class, Builders.getResource("schema_marker"));
+    }
 
     public static void registerItemBlocks(IForgeRegistry<Item> registry) {
         registry.register(ITEM_MARKER);
