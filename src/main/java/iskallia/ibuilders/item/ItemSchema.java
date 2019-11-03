@@ -24,6 +24,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -118,8 +119,8 @@ public class ItemSchema extends Item {
             NBTTagCompound schematicaMapping = schematicNBT.getCompoundTag("SchematicaMapping");
             int i = 0;
             for (String mapping : schematicaMapping.getKeySet()) {
-                if (i >= 3) {
-                    tooltip.add("...");
+                if (i >= 3 && !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                    tooltip.add("... Press shift for more content");
                     break;
                 }
 
