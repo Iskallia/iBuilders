@@ -4,6 +4,7 @@ import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.init.InitModel;
+import iskallia.ibuilders.init.InitPacket;
 import iskallia.ibuilders.init.InitSchematic;
 import iskallia.ibuilders.net.context.ServerContext;
 import net.minecraft.world.GameType;
@@ -20,7 +21,11 @@ public class EventMod {
         }
     }
 
-    public static void onInitialization(FMLInitializationEvent event) { }
+    public static void onInitialization(FMLInitializationEvent event) {
+        if(event.getSide() == Side.SERVER) {
+            InitPacket.registerPackets();
+        }
+    }
 
     public static void onPostInitialization(FMLPostInitializationEvent event) {
         InitConfig.registerConfigs();
