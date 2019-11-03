@@ -84,6 +84,7 @@ public class Listener extends Thread {
     private Context getContext() {
         if(this.side == Side.CLIENT) {
             ClientContext clientContext = new ClientContext();
+            clientContext.listener = this;
             this.contextCreatedConsumers.forEach(contextConsumer -> contextConsumer.accept(clientContext));
             return clientContext;
         } else if(this.side == Side.SERVER) {

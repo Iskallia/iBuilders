@@ -15,6 +15,10 @@ public class PacketRequestSchematic extends Packet implements C2SMessage, S2CMes
     private String name;
     private BuildersSchematic schematic;
 
+    private PacketRequestSchematic() {
+
+    }
+
     public PacketRequestSchematic(String playerUuid, String name) {
         this.playerUuid = playerUuid;
         this.name = name;

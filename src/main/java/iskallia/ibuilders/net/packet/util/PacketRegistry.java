@@ -4,6 +4,7 @@ import iskallia.ibuilders.net.packet.Packet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PacketRegistry {
 
@@ -19,6 +20,10 @@ public class PacketRegistry {
 
     public static int getPacketId(Packet packet) {
         return packetsClasses.indexOf(packet.getClass());
+    }
+
+    public static List<String> getRegistry() {
+        return packetsClasses.stream().map(Class::getName).collect(Collectors.toList());
     }
 
 }
