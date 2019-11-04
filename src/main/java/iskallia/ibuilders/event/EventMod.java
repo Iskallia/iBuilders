@@ -2,19 +2,27 @@ package iskallia.ibuilders.event;
 
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
+import iskallia.ibuilders.gui.GuiHandler;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.init.InitModel;
 import iskallia.ibuilders.init.InitPacket;
 import iskallia.ibuilders.init.InitSchematic;
 import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.ServerContext;
+import iskallia.ibuilders.schematic.BuildersFormat;
+import iskallia.ibuilders.schematic.BuildersSchematic;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class EventMod {
 
-    public static void onConstruction(FMLConstructionEvent event) { }
+    public static void onConstruction(FMLConstructionEvent event) {
+        //Stops a crash bug, WTF?
+        new BuildersFormat().writeToNBT(new NBTTagCompound(), new BuildersSchematic(0, 0, 0));
+    }
 
     public static void onPreInitialization(FMLPreInitializationEvent event) {
         if(event.getSide() == Side.CLIENT) {
@@ -26,6 +34,8 @@ public class EventMod {
         if(event.getSide() == Side.SERVER) {
             InitPacket.registerPackets();
         }
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(Builders.getInstance(), new GuiHandler());
     }
 
     public static void onPostInitialization(FMLPostInitializationEvent event) {
