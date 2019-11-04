@@ -4,7 +4,6 @@ import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;

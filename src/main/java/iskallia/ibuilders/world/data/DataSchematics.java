@@ -3,7 +3,6 @@ package iskallia.ibuilders.world.data;
 import com.google.common.collect.Lists;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
@@ -57,6 +56,14 @@ public class DataSchematics extends WorldSavedData {
         }
 
         return null;
+    }
+
+    public void addSchematic(String playerUuid, BuildersSchematic schematic) {
+        if(!this.schematicsMap.containsKey(playerUuid)) {
+            this.schematicsMap.put(playerUuid, Lists.newArrayList());
+        }
+
+        this.schematicsMap.get(playerUuid).add(schematic);
     }
 
     @Override

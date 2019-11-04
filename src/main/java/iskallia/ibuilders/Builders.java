@@ -18,7 +18,7 @@ public class Builders {
 
     public static final String MOD_ID = "ibuilders";
     public static final String MOD_NAME = "iBuilders";
-    public static final String MOD_VERSION = "${version}";
+    public static final String MOD_VERSION = "0.0.1";
 
     public static Builders getInstance() {
         return INSTANCE;

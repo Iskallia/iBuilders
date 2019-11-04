@@ -3,7 +3,6 @@ package iskallia.ibuilders.tab;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitBlock;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 public class CreativeTabsIBuilders extends CreativeTabs {

@@ -38,6 +38,7 @@ public class Listener extends Thread {
     private List<Consumer<Context>> contextCreatedConsumers = new ArrayList<>();
 
     public Listener(Socket socket) {
+        this.setName("[iBuilders] Listener " + this.getListenerId());
         this.connectionAddress = new NetAddress(socket.getInetAddress().getHostAddress(), socket.getPort());
 
         try {
@@ -54,6 +55,7 @@ public class Listener extends Thread {
     }
 
     public Listener(String address, int port) {
+        this.setName("[iBuilders] Listener " + this.getListenerId());
         this.connectionAddress = new NetAddress(address, port);
 
         try {
@@ -84,6 +86,7 @@ public class Listener extends Thread {
     private Context getContext() {
         if(this.side == Side.CLIENT) {
             ClientContext clientContext = new ClientContext();
+            clientContext.listener = this;
             this.contextCreatedConsumers.forEach(contextConsumer -> contextConsumer.accept(clientContext));
             return clientContext;
         } else if(this.side == Side.SERVER) {
@@ -108,15 +111,18 @@ public class Listener extends Thread {
     private void listen() {
         if(!this.isConnected())return;
 
-        for(Consumer<Listener> listenerConsumer: this.connectionEstablishedConsumers) {
-            listenerConsumer.accept(this);
-        }
+        this.connectionEstablishedConsumers.forEach(listenerConsumer -> listenerConsumer.accept(this));
 
         while(this.isConnected() && !this.socket.isClosed()) {
             String data = this.readPacket();
             if(data == null)continue;
 
-            PACKET_HANDLER.onPacketReceived(data, this.getContext());
+            try {
+                Packet returnedPacket = PACKET_HANDLER.onPacketReceived(data, this.getContext());
+                if (returnedPacket != null) this.sendPacket(returnedPacket);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
         this.disconnect();
