@@ -9,8 +9,10 @@ import javax.annotation.Nonnull;
 
 public class BuildersSchematic extends SchematicBase {
 
+    // TODO: private int workload (in months)
+    // TODO: private List<ItemFighterEgg> workerList (?)
     private BuildersSchematic.Info info = new BuildersSchematic.Info();
-    private int hash;
+    private long hash;
 
     public BuildersSchematic(int width, int height, int length) {
         super(width, height, length);
@@ -20,12 +22,23 @@ public class BuildersSchematic extends SchematicBase {
         return info;
     }
 
-    public int getHash() {
+    public long getHash() {
         return hash;
     }
 
-    public void setHash(int hash) {
+    public void setHash(long hash) {
         this.hash = hash;
+    }
+
+    @Nonnull
+    @Override
+    public String getAuthor() {
+        return info.getAuthor();
+    }
+
+    @Override
+    public void setAuthor(@Nonnull String author) {
+        this.info.setAuthor(author);
     }
 
     @Override
@@ -41,18 +54,8 @@ public class BuildersSchematic extends SchematicBase {
         super.setTileEntity(pos, schematicTE);
     }
 
-    @Nonnull
-    @Override
-    public String getAuthor() {
-        return info.getAuthor();
-    }
-
-    @Override
-    public void setAuthor(@Nonnull String author) {
-        this.info.setAuthor(author);
-    }
-
     public static class Info {
+        // TODO: private long dateUnix
         private String name;
         private String description;
         private String author;

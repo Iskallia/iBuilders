@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemSchema extends Item {
+public class ItemBlueprint extends Item {
 
     public static ItemStack setSchematicNBT(ItemStack schemaStack, BuildersSchematic schematic) {
         NBTTagCompound stackNBT = schemaStack.getTagCompound();
@@ -44,7 +44,7 @@ public class ItemSchema extends Item {
         return schemaStack;
     }
 
-    public ItemSchema(String name) {
+    public ItemBlueprint(String name) {
         this.setUnlocalizedName(name);
         this.setRegistryName(Builders.getResource(name));
         this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
@@ -60,12 +60,12 @@ public class ItemSchema extends Item {
         TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, pos);
 
         if (clickedBlock != InitBlock.MARKER) {
-            player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.not_marker"), true);
+            player.sendStatusMessage(new TextComponentTranslation("use.build_blueprint.fail.not_marker"), true);
             return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
         }
 
         if (markerTileEntity == null || markerTileEntity.isUnset()) {
-            player.sendStatusMessage(new TextComponentTranslation("use.item_schema.fail.not_connected"), true);
+            player.sendStatusMessage(new TextComponentTranslation("use.build_blueprint.fail.not_connected"), true);
             return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
         }
 
@@ -81,8 +81,8 @@ public class ItemSchema extends Item {
         schematic.getInfo().setName("TEST BUILD SCHEME"); // TODO
         schematic.getInfo().setDescription("TEST DESCRIPTION"); // TODO
 
-        ItemSchema.setSchematicNBT(heldStack, schematic);
-        player.sendStatusMessage(new TextComponentTranslation("use.item_schema.success"), true);
+        ItemBlueprint.setSchematicNBT(heldStack, schematic);
+        player.sendStatusMessage(new TextComponentTranslation("use.build_blueprint.success"), true);
 
         return EnumActionResult.SUCCESS;
     }
@@ -101,10 +101,11 @@ public class ItemSchema extends Item {
 
             String name = infoNBT.getString("Name");
             String description = infoNBT.getString("Description");
-            String author = schematicNBT.getString("Author");
+            String author = infoNBT.getString("Author");
 
             // TODO: i18n-izify + colorize those values
-            tooltip.add("Name: " + name + " (" + Integer.toHexString(schematicNBT.getInteger("Hash")) + ")");
+            tooltip.add("Name: " + name);
+            tooltip.add("Hash: " + Long.toHexString(schematicNBT.getLong("Hash")).toUpperCase());
             tooltip.add("By: " + author);
             tooltip.add("Dimensions: " + width + "x" + height + "x" + length);
             tooltip.add("");
@@ -131,7 +132,7 @@ public class ItemSchema extends Item {
             tooltip.add("Description: " + description);
 
         } else {
-            tooltip.add(new TextComponentTranslation("tooltip.item_schema.empty").getFormattedText());
+            tooltip.add(new TextComponentTranslation("tooltip.build_blueprint.empty").getFormattedText());
         }
 
         super.addInformation(stack, world, tooltip, flagIn);

@@ -18,7 +18,7 @@ public class TileEntitySchematicTerminal extends TileEntity {
     protected ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            return stack.getItem() == InitItem.SCHEMA;
+            return stack.getItem() == InitItem.BLUEPRINT;
         }
     };
 

@@ -206,4 +206,6 @@ public abstract class SchematicFormatBase extends SchematicFormat {
         return true;
     }
 
+    public abstract long hash(NBTTagCompound nbt);
+
 }

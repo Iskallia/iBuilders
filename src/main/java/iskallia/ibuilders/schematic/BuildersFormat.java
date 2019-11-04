@@ -2,7 +2,10 @@ package iskallia.ibuilders.schematic;
 
 import com.github.lunatrius.schematica.api.ISchematic;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
+
+import java.util.Arrays;
 
 public class BuildersFormat extends SchematicFormatBase {
 
@@ -24,6 +27,54 @@ public class BuildersFormat extends SchematicFormatBase {
         return ".schematic";
     }
 
+    /*
+    {
+        Schematic:{
+            Width:1s,
+            Height:3s,
+            Length:2s,
+            Materials:"Alpha",
+            Blocks:[B;20B,54B,20B,20B,20B,20B],
+            Data:[B;0B,4B,0B,0B,0B,0B],
+            SchematicaMapping:{"minecraft:glass":20s,"minecraft:chest":54s},
+            TileEntities:[{ForgeData:{},x:0,y:0,z:1,Items:[],id:"minecraft:chest",Lock:""}],
+            Entities:[],
+
+            Hash:-304185190,
+            Info:{
+                  Description:"TEST DESCRIPTION",
+                  Author:"FakeGuy",
+                  Name:"TEST BUILD SCHEME"
+           },
+     }
+     */
+    @Override
+    public long hash(NBTTagCompound nbt) {
+        long hash = 0b0000100100000111110110111111100101100111000100010001101101101111L; // prime bias
+
+        short width = nbt.getShort("Width");
+        short height = nbt.getShort("Height");
+        short length = nbt.getShort("Length");
+        short sizeHash = (short) (width ^ height ^ length);
+
+        hash = ((long) sizeHash << (64 - 16)) ^ hash;
+
+        byte[] blocks = nbt.getByteArray("Blocks");
+        byte[] data = nbt.getByteArray("Data");
+        NBTTagCompound schematicaMapping = nbt.getCompoundTag("SchematicaMapping");
+        int blocksHash = Arrays.hashCode(blocks) ^ Arrays.hashCode(data) ^ schematicaMapping.hashCode();
+
+        hash = (blocksHash << (64 - 32)) ^ hash;
+
+        NBTTagList tileEntities = nbt.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND);
+        NBTTagList entities = nbt.getTagList("Entities", Constants.NBT.TAG_COMPOUND);
+        int entityHash = tileEntities.hashCode() ^ tileEntities.hashCode();
+
+        hash = entityHash ^ hash;
+
+        return hash;
+    }
+
     @Override
     public boolean writeToNBT(NBTTagCompound tagCompound, ISchematic schematic) {
         boolean result = super.writeToNBT(tagCompound, schematic);
@@ -34,7 +85,7 @@ public class BuildersFormat extends SchematicFormatBase {
             NBTTagCompound infoNBT = new NBTTagCompound();
 
             // Evaluate and put hash even before the input derived from user.
-            tagCompound.setInteger("Hash", tagCompound.hashCode());
+            tagCompound.setLong("Hash", hash(tagCompound));
 
             if (info.getName() != null)
                 infoNBT.setString("Name", info.getName());
@@ -55,7 +106,7 @@ public class BuildersFormat extends SchematicFormatBase {
     public BuildersSchematic readFromNBT(NBTTagCompound tagCompound) {
         BuildersSchematic buildersSchematic = super.readFromNBT(tagCompound);
 
-        buildersSchematic.setHash(tagCompound.getInteger("Hash"));
+        buildersSchematic.setHash(tagCompound.getLong("Hash"));
 
         if (tagCompound.hasKey("Info", Constants.NBT.TAG_COMPOUND)) {
             NBTTagCompound infoNBT = tagCompound.getCompoundTag("Info");

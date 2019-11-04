@@ -12,7 +12,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 public class InitModel {
 
     public static void registerItemModels() {
-        registerSimpleItemModel(InitItem.SCHEMA, 0);
+        registerSimpleItemModel(InitItem.BLUEPRINT, 0);
 
         registerSimpleItemModel(InitBlock.ITEM_MARKER, 0);
     }
