@@ -16,6 +16,16 @@ public class TileEntitySchematicTerminal extends TileEntity {
 
     //A 1 slot inventory to hold the schema item.
     protected ItemStackHandler inventory = new ItemStackHandler(1) {
+        @Nonnull
+        @Override
+        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            if(!this.isItemValid(slot, stack)) {
+                return stack;
+            }
+
+            return super.insertItem(slot, stack, simulate);
+        }
+
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             return stack.getItem() == InitItem.BLUEPRINT;
