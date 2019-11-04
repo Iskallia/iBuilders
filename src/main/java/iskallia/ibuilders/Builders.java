@@ -1,6 +1,7 @@
 package iskallia.ibuilders;
 
 import iskallia.ibuilders.event.EventMod;
+import iskallia.ibuilders.net.NetworkHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
@@ -14,7 +15,7 @@ public class Builders {
 
     @Mod.Instance
     private static Builders INSTANCE;
-    public static  NetworkHandler NETWORK = new NetworkHandler();
+    public static NetworkHandler NETWORK = new NetworkHandler();
 
     public static final String MOD_ID = "ibuilders";
     public static final String MOD_NAME = "iBuilders";

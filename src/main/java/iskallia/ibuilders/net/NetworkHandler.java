@@ -1,5 +1,6 @@
-package iskallia.ibuilders;
+package iskallia.ibuilders.net;
 
+import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.net.NetAddress;
 import iskallia.ibuilders.net.connection.Listener;
