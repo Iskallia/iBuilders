@@ -76,6 +76,43 @@ public class BuildersFormat extends SchematicFormatBase {
     }
 
     @Override
+    public long hash(NBTTagCompound  nbt) {
+        long hash = 0;
+
+        short[] saltData = {
+            nbt.getShort("Width"),
+            nbt.getShort("Height"),
+            nbt.getShort("Length")
+        };
+
+        long salt = 0;
+
+        for (int i = 0; i < saltData.length; i++) {
+            salt = 805306457L * salt + saltData[i];
+        }
+
+        //Because of the nature of such LCGs, an even salt offers a maximum period of m / 4.
+        salt |= 1;
+        hash = salt;
+
+        for(int i = 0; i < 5; i++) {
+            hash = hash * 2862933555777941757L + salt;
+        }
+
+        byte[] blocks = nbt.getByteArray("Blocks");
+        byte[] data = nbt.getByteArray("Data");
+        int blocksHash = Arrays.hashCode(blocks) ^ Arrays.hashCode(data);
+        hash *= blocksHash;
+
+        NBTTagList tileEntities = nbt.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND);
+        NBTTagList entities = nbt.getTagList("Entities", Constants.NBT.TAG_COMPOUND);
+        int entityHash = tileEntities.hashCode() ^ entities.hashCode();
+        hash *= entityHash;
+
+        return hash * 2862933555777941757L + salt;
+    }
+
+    @Override
     public boolean writeToNBT(NBTTagCompound tagCompound, ISchematic schematic) {
         boolean result = super.writeToNBT(tagCompound, schematic);
 
