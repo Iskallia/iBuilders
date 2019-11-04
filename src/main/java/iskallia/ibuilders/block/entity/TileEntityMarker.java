@@ -149,6 +149,7 @@ public class TileEntityMarker extends TileEntitySynchronized {
             Objects.requireNonNull(getMarkerTileEntity(world, extensionZ)).setMasterPos(pos);
         }
 
+        markForUpdate();
         return extensionsSet;
     }
 
@@ -175,6 +176,7 @@ public class TileEntityMarker extends TileEntitySynchronized {
         extensionX = null;
         extensionY = null;
         extensionZ = null;
+        markForUpdate();
     }
 
     @Override

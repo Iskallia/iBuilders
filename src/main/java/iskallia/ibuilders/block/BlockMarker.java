@@ -253,11 +253,15 @@ public class BlockMarker extends BlockDirectional {
             BlockPos negativePos = pos.add(0, -i, 0);
 
             if (world.getBlockState(positivePos).getBlock() == InitBlock.MARKER) {
-                return positivePos.getY();
+                TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, positivePos);
+                if (markerTileEntity != null && markerTileEntity.isUnset())
+                    return positivePos.getY();
             }
 
             if (world.getBlockState(negativePos).getBlock() == InitBlock.MARKER) {
-                return negativePos.getY();
+                TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, negativePos);
+                if (markerTileEntity != null && markerTileEntity.isUnset())
+                    return negativePos.getY();
             }
         }
 
@@ -270,11 +274,15 @@ public class BlockMarker extends BlockDirectional {
             BlockPos negativePos = pos.add(-i, 0, 0);
 
             if (world.getBlockState(positivePos).getBlock() == InitBlock.MARKER) {
-                return positivePos.getX();
+                TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, positivePos);
+                if (markerTileEntity != null && markerTileEntity.isUnset())
+                    return positivePos.getX();
             }
 
             if (world.getBlockState(negativePos).getBlock() == InitBlock.MARKER) {
-                return negativePos.getX();
+                TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, negativePos);
+                if (markerTileEntity != null && markerTileEntity.isUnset())
+                    return negativePos.getX();
             }
         }
 
@@ -287,11 +295,15 @@ public class BlockMarker extends BlockDirectional {
             BlockPos negativePos = pos.add(0, 0, -i);
 
             if (world.getBlockState(positivePos).getBlock() == InitBlock.MARKER) {
-                return positivePos.getZ();
+                TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, positivePos);
+                if (markerTileEntity != null && markerTileEntity.isUnset())
+                    return positivePos.getZ();
             }
 
             if (world.getBlockState(negativePos).getBlock() == InitBlock.MARKER) {
-                return negativePos.getZ();
+                TileEntityMarker markerTileEntity = TileEntityMarker.getMarkerTileEntity(world, negativePos);
+                if (markerTileEntity != null && markerTileEntity.isUnset())
+                    return negativePos.getZ();
             }
         }
 
