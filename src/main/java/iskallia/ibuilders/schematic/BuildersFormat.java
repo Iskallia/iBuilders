@@ -49,33 +49,6 @@ public class BuildersFormat extends SchematicFormatBase {
      }
      */
     @Override
-    public long hash(NBTTagCompound nbt) {
-        long hash = 0b0000100100000111110110111111100101100111000100010001101101101111L; // prime bias
-
-        short width = nbt.getShort("Width");
-        short height = nbt.getShort("Height");
-        short length = nbt.getShort("Length");
-        short sizeHash = (short) (width ^ height ^ length);
-
-        hash = ((long) sizeHash << (64 - 16)) ^ hash;
-
-        byte[] blocks = nbt.getByteArray("Blocks");
-        byte[] data = nbt.getByteArray("Data");
-        NBTTagCompound schematicaMapping = nbt.getCompoundTag("SchematicaMapping");
-        int blocksHash = Arrays.hashCode(blocks) ^ Arrays.hashCode(data) ^ schematicaMapping.hashCode();
-
-        hash = (blocksHash << (64 - 32)) ^ hash;
-
-        NBTTagList tileEntities = nbt.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND);
-        NBTTagList entities = nbt.getTagList("Entities", Constants.NBT.TAG_COMPOUND);
-        int entityHash = tileEntities.hashCode() ^ tileEntities.hashCode();
-
-        hash = entityHash ^ hash;
-
-        return hash;
-    }
-
-    @Override
     public long hash(NBTTagCompound  nbt) {
         long hash = 0;
 
