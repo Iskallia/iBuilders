@@ -1,7 +1,8 @@
 package iskallia.ibuilders.net.packet.mc;
 
 import io.netty.buffer.ByteBuf;
-import iskallia.ibuilders.gui.container.ISchemaInfo;
+import iskallia.ibuilders.gui.container.GuiContainerCreator;
+import iskallia.ibuilders.gui.container.GuiContainerSchemaInfo;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -62,8 +63,8 @@ public class S2CSchemaInfo implements IMessage {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 GuiScreen gui = Minecraft.getMinecraft().currentScreen;
 
-                if(gui instanceof ISchemaInfo) {
-                    ISchemaInfo schemaGui = (ISchemaInfo)gui;
+                if(gui instanceof GuiContainerSchemaInfo) {
+                    GuiContainerSchemaInfo schemaGui = (GuiContainerSchemaInfo)gui;
                     if(message.action == Action.OVERWRITE) {
                         schemaGui.setInfoList(message.infoList);
                     } else if(message.action == Action.ADD) {
