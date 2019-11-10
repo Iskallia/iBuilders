@@ -1,7 +1,7 @@
 package iskallia.ibuilders.net.packet.mc;
 
 import io.netty.buffer.ByteBuf;
-import iskallia.ibuilders.gui.container.GuiContainerSchematicTerminal;
+import iskallia.ibuilders.gui.container.ISchemaInfo;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -15,10 +15,9 @@ import java.util.List;
 
 public class S2CUserUploads implements IMessage {
 
-    private final List<BuildersSchematic.Info> infoList;
+    private List<BuildersSchematic.Info> infoList = new ArrayList<>();
 
     public S2CUserUploads() {
-        this.infoList = new ArrayList<>();
     }
 
     public S2CUserUploads(List<BuildersSchematic.Info> infoList) {
@@ -55,9 +54,8 @@ public class S2CUserUploads implements IMessage {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 GuiScreen gui = Minecraft.getMinecraft().currentScreen;
 
-                if(gui instanceof GuiContainerSchematicTerminal) {
-                    GuiContainerSchematicTerminal guiContainer = (GuiContainerSchematicTerminal)gui;
-                    guiContainer.setInfo(message.infoList);
+                if(gui instanceof ISchemaInfo) {
+                    ((ISchemaInfo)gui).setInfoList(message.infoList);
                 }
             });
 

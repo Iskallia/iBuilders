@@ -128,7 +128,7 @@ public class BuildersFormat extends SchematicFormatBase {
                 buildersSchematic.getInfo().setDescription(infoNBT.getString("Description"));
 
             if (infoNBT.hasKey("Author", Constants.NBT.TAG_STRING))
-                buildersSchematic.getInfo().setDescription(infoNBT.getString("Author"));
+                buildersSchematic.getInfo().setAuthor(infoNBT.getString("Author"));
         }
 
         return buildersSchematic;

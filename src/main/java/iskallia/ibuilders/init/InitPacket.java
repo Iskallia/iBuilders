@@ -5,7 +5,7 @@ import iskallia.ibuilders.net.packet.PacketC2SHandshake;
 import iskallia.ibuilders.net.packet.PacketRequestSchemaInfo;
 import iskallia.ibuilders.net.packet.PacketRequestSchematic;
 import iskallia.ibuilders.net.packet.PacketS2CDisconnect;
-import iskallia.ibuilders.net.packet.mc.C2SUploadSchematic;
+import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
 import iskallia.ibuilders.net.packet.mc.S2CUserUploads;
 import iskallia.ibuilders.net.packet.util.PacketRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -26,7 +26,7 @@ public class InitPacket {
 
     public static void registerMCPackets() {
         PIPELINE = NetworkRegistry.INSTANCE.newSimpleChannel(Builders.MOD_ID);
-        PIPELINE.registerMessage(C2SUploadSchematic.Handler.class, C2SUploadSchematic.class, nextId(), Side.SERVER);
+        PIPELINE.registerMessage(C2STerminalAction.Handler.class, C2STerminalAction.class, nextId(), Side.SERVER);
         PIPELINE.registerMessage(S2CUserUploads.Handler.class, S2CUserUploads.class, nextId(), Side.CLIENT);
     }
 

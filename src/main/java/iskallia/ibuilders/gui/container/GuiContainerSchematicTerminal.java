@@ -3,7 +3,7 @@ package iskallia.ibuilders.gui.container;
 import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
 import iskallia.ibuilders.container.ContainerSchematicTerminal;
 import iskallia.ibuilders.init.InitPacket;
-import iskallia.ibuilders.net.packet.mc.C2SUploadSchematic;
+import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -16,13 +16,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiContainerSchematicTerminal extends GuiContainer {
+public class GuiContainerSchematicTerminal extends GuiContainer implements ISchemaInfo {
 
     protected int centerX;
     protected int centerY;
 
     protected GuiButton uploadButton;
-    private GuiButton[] infoButtons = new GuiButton[4];
+    private GuiButton[] infoButtons = new GuiButton[8];
+    private GuiButton[] deleteButtons = new GuiButton[infoButtons.length];
     private List<BuildersSchematic.Info> infoList = new ArrayList<>();
     private int infoOffset;
 
@@ -35,15 +36,19 @@ public class GuiContainerSchematicTerminal extends GuiContainer {
         super.initGui();
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
-        this.addButton(this.uploadButton = new GuiButton(0, this.centerX - 65, this.centerY - 85, 60, 20, "UPLOAD"));
-        this.addButton(this.infoButtons[0] =  new GuiButton(1, this.centerX + 100, this.centerY - 40, ""));
-        this.addButton(this.infoButtons[1] =  new GuiButton(2, this.centerX + 100, this.centerY - 20, ""));
-        this.addButton(this.infoButtons[2] =  new GuiButton(3, this.centerX + 100, this.centerY, ""));
-        this.addButton(this.infoButtons[3] =  new GuiButton(4, this.centerX + 100, this.centerY + 20, ""));
+        this.guiLeft = this.centerX - 200;
+
+        this.addButton(this.uploadButton = new GuiButton(0, this.centerX - 180, this.centerY - 85, 60, 20, "UPLOAD"));
+
+        for(int i = 0; i < this.infoButtons.length; i++) {
+            this.addButton(this.infoButtons[i] =  new GuiButton(1, this.centerX, this.centerY + (i * 20) - 100, ""));
+            this.addButton(this.deleteButtons[i] =  new GuiButton(1, this.centerX + 200, this.centerY + (i * 20) - 100, 20, 20, "[X]"));
+        }
+
         this.updateUploadButton();
         this.updateInfoButtons();
-        //TODO: fix this.
-        InitPacket.PIPELINE.sendToServer(new C2SUploadSchematic());
+
+        InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.GET_INFO));
     }
 
     @Override
@@ -92,8 +97,10 @@ public class GuiContainerSchematicTerminal extends GuiContainer {
 
             if(info == null) {
                 this.infoButtons[i].visible = false;
+                this.deleteButtons[i].visible = false;
             } else {
                 this.infoButtons[i].visible = true;
+                this.deleteButtons[i].visible = true;
                 this.infoButtons[i].displayString = info.toString();
             }
         }
@@ -102,7 +109,19 @@ public class GuiContainerSchematicTerminal extends GuiContainer {
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         if(button == this.uploadButton) {
-            InitPacket.PIPELINE.sendToServer(new C2SUploadSchematic());
+            InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.UPLOAD));
+        }
+
+        for(int i = 0; i < this.infoButtons.length; i++) {
+            if(button == this.infoButtons[i]) {
+
+            } else if(button == this.deleteButtons[i]) {
+                BuildersSchematic.Info info = i + this.infoOffset >= this.infoList.size() ? null : this.infoList.get(i + this.infoOffset);
+
+                if(info != null) {
+                    InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.DELETE, info.getName()));
+                }
+            }
         }
 
         super.actionPerformed(button);
@@ -113,8 +132,14 @@ public class GuiContainerSchematicTerminal extends GuiContainer {
         this.drawDefaultBackground();
     }
 
-    public void setInfo(List<BuildersSchematic.Info> infoList) {
+    @Override
+    public void setInfoList(List<BuildersSchematic.Info> infoList) {
         this.infoList = infoList;
+    }
+
+    @Override
+    public List<BuildersSchematic.Info> getInfoList() {
+        return this.infoList;
     }
 
 }

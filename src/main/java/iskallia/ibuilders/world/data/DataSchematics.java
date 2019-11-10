@@ -68,6 +68,17 @@ public class DataSchematics extends WorldSavedData {
         return null;
     }
 
+    public void removeSchematic(String playerUuid, String name) {
+        if(!this.schematicsMap.containsKey(playerUuid))return;
+        List<BuildersSchematic> schematics = this.schematicsMap.get(playerUuid);
+
+        if(schematics == null || schematics.isEmpty()) {
+            return;
+        }
+
+        schematics.removeIf(schematic -> schematic.getInfo().getName().equals(name));
+    }
+
     public boolean hasSchematic(String playerUuid, String name) {
         return this.getSchematic(playerUuid, name) != null;
     }
