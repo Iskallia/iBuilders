@@ -1,7 +1,10 @@
 package iskallia.ibuilders.gui;
 
+import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
+import iskallia.ibuilders.container.ContainerCreator;
 import iskallia.ibuilders.container.ContainerSchematicTerminal;
+import iskallia.ibuilders.gui.container.GuiContainerCreator;
 import iskallia.ibuilders.gui.container.GuiContainerSchematicTerminal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -25,7 +28,10 @@ public class GuiHandler implements IGuiHandler {
                 return new ContainerSchematicTerminal(world, player, (TileEntitySchematicTerminal)tileEntity);
             }
         } else if(id == CREATOR) {
-
+            TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+            if(tileEntity instanceof TileEntityCreator) {
+                return new ContainerCreator(world, player, (TileEntityCreator)tileEntity);
+            }
         }
 
         return null;
@@ -40,7 +46,10 @@ public class GuiHandler implements IGuiHandler {
                 return new GuiContainerSchematicTerminal(world, player, (TileEntitySchematicTerminal)tileEntity);
             }
         } else if(id == CREATOR) {
-
+            TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+            if(tileEntity instanceof TileEntityCreator) {
+                return new GuiContainerCreator(world, player, (TileEntityCreator)tileEntity);
+            }
         }
 
         return null;

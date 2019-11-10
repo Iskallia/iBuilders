@@ -1,6 +1,6 @@
 package iskallia.ibuilders.container;
 
-import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
+import iskallia.ibuilders.block.entity.TileEntityCreator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -11,25 +11,27 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class ContainerSchematicTerminal extends Container {
+public class ContainerCreator extends Container {
 
     private final World world;
     private final EntityPlayer player;
-    private final TileEntitySchematicTerminal schematicTerminal;
+    private final TileEntityCreator creator;
     private final InventoryPlayer playerInventory;
-    private final IItemHandler schematicTerminalInventory;
+    private final IItemHandler creatorInventory;
 
-    public ContainerSchematicTerminal(World world, EntityPlayer player, TileEntitySchematicTerminal schematicTerminal) {
+    public ContainerCreator(World world, EntityPlayer player, TileEntityCreator creator) {
         this.world = world;
         this.player = player;
-        this.schematicTerminal = schematicTerminal;
+        this.creator = creator;
         this.playerInventory = player.inventory;
-        this.schematicTerminalInventory = schematicTerminal.getCapability(
+        this.creatorInventory = creator.getCapability(
                 CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
                 player.getHorizontalFacing()
         );
 
-        this.addSlotToContainer(new SlotItemHandler(this.schematicTerminalInventory, 0, 0,0));
+        this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 0, 0,0));
+        this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 1, 20,0));
+        this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 2, 40,0));
 
         for(int l = 0; l < 3; ++l) {
             for(int k = 0; k < 9; ++k) {

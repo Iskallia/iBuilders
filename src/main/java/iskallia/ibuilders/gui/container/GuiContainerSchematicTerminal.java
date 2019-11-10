@@ -42,6 +42,7 @@ public class GuiContainerSchematicTerminal extends GuiContainer {
         this.addButton(this.infoButtons[3] =  new GuiButton(4, this.centerX + 100, this.centerY + 20, ""));
         this.updateUploadButton();
         this.updateInfoButtons();
+        //TODO: fix this.
         InitPacket.PIPELINE.sendToServer(new C2SUploadSchematic());
     }
 

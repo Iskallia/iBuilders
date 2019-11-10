@@ -71,4 +71,5 @@ public class BlockSchematicTerminal extends Block {
 
         return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
     }
+
 }
