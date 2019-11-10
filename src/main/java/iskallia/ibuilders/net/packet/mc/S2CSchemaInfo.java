@@ -13,19 +13,22 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class S2CUserUploads implements IMessage {
+public class S2CSchemaInfo implements IMessage {
 
+    private Action action;
     private List<BuildersSchematic.Info> infoList = new ArrayList<>();
 
-    public S2CUserUploads() {
+    public S2CSchemaInfo() {
     }
 
-    public S2CUserUploads(List<BuildersSchematic.Info> infoList) {
+    public S2CSchemaInfo(Action action, List<BuildersSchematic.Info> infoList) {
+        this.action = action;
         this.infoList = infoList;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        this.action = Action.values()[buf.readInt()];
         int size = buf.readShort();
 
         for(int i = 0; i < size; i++) {
@@ -39,6 +42,7 @@ public class S2CUserUploads implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeInt(this.action.ordinal());
         buf.writeShort(this.infoList.size());
 
         this.infoList.forEach(info -> {
@@ -48,14 +52,23 @@ public class S2CUserUploads implements IMessage {
         });
     }
 
-    public static class Handler implements IMessageHandler<S2CUserUploads, IMessage> {
+    public enum Action {
+        OVERWRITE, ADD
+    }
+
+    public static class Handler implements IMessageHandler<S2CSchemaInfo, IMessage> {
         @Override
-        public IMessage onMessage(S2CUserUploads message, MessageContext ctx) {
+        public IMessage onMessage(S2CSchemaInfo message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 GuiScreen gui = Minecraft.getMinecraft().currentScreen;
 
                 if(gui instanceof ISchemaInfo) {
-                    ((ISchemaInfo)gui).setInfoList(message.infoList);
+                    ISchemaInfo schemaGui = (ISchemaInfo)gui;
+                    if(message.action == Action.OVERWRITE) {
+                        schemaGui.setInfoList(message.infoList);
+                    } else if(message.action == Action.ADD) {
+                        schemaGui.getInfoList().addAll(message.infoList);
+                    }
                 }
             });
 

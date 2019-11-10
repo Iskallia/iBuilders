@@ -16,8 +16,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class C2STerminalAction implements IMessage {
 
-    private String[] args;
     private Action action;
+    private String[] args;
 
     public C2STerminalAction() {
     }
@@ -65,7 +65,7 @@ public class C2STerminalAction implements IMessage {
                 String playerUuid = player.getUniqueID().toString();
 
                 if(message.action == Action.GET_INFO) {
-                    return new S2CUserUploads(dataSchematics.getInfoFor(playerUuid));
+                    return new S2CSchemaInfo(S2CSchemaInfo.Action.OVERWRITE, dataSchematics.getInfoFor(playerUuid));
                 } else if(message.action == Action.UPLOAD) {
                     ContainerSchematicTerminal schematicTerminal = (ContainerSchematicTerminal)container;
                     ItemStack blueprint = schematicTerminal.inventorySlots.get(0).getStack();
@@ -81,10 +81,10 @@ public class C2STerminalAction implements IMessage {
                         }
                     }
 
-                    return new S2CUserUploads(dataSchematics.getInfoFor(playerUuid));
+                    return new S2CSchemaInfo(S2CSchemaInfo.Action.OVERWRITE, dataSchematics.getInfoFor(playerUuid));
                 } else if(message.action == Action.DELETE) {
                     dataSchematics.removeSchematic(playerUuid, message.args[0]);
-                    return new S2CUserUploads(dataSchematics.getInfoFor(playerUuid));
+                    return new S2CSchemaInfo(S2CSchemaInfo.Action.OVERWRITE, dataSchematics.getInfoFor(playerUuid));
                 }
             }
 

@@ -1,7 +1,10 @@
 package iskallia.ibuilders.net.packet;
 
+import iskallia.ibuilders.container.ContainerCreator;
+import iskallia.ibuilders.init.InitPacket;
 import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.ServerContext;
+import iskallia.ibuilders.net.packet.mc.S2CSchemaInfo;
 import iskallia.ibuilders.net.packet.util.C2SMessage;
 import iskallia.ibuilders.net.packet.util.S2CMessage;
 import iskallia.ibuilders.schematic.BuildersSchematic;
@@ -36,7 +39,14 @@ public class PacketRequestSchemaInfo extends Packet implements C2SMessage, S2CMe
     //On received on the live server.
     @Override
     public Packet onPacketReceived(ClientContext context) {
-        //Sync infoList to GUI?
+        context.minecraftServer.addScheduledTask(() -> {
+            context.minecraftServer.getPlayerList().getPlayers().forEach(entityPlayerMP -> {
+                if(entityPlayerMP.openContainer instanceof ContainerCreator) {
+                    InitPacket.PIPELINE.sendTo(new S2CSchemaInfo(S2CSchemaInfo.Action.ADD, this.infoList), entityPlayerMP);
+                }
+            });
+        });
+
         return null;
     }
 }

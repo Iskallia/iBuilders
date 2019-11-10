@@ -2,14 +2,12 @@ package iskallia.ibuilders.net;
 
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitConfig;
-import iskallia.ibuilders.net.NetAddress;
 import iskallia.ibuilders.net.connection.Listener;
 import iskallia.ibuilders.net.connection.ServerListener;
 import iskallia.ibuilders.net.packet.Packet;
 import iskallia.ibuilders.net.packet.PacketC2SHandshake;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class NetworkHandler {
 
@@ -17,7 +15,8 @@ public class NetworkHandler {
     private long time;
 
     private ServerListener serverListener;
-    private List<Listener> listeners = new ArrayList<>();
+    private ConcurrentLinkedDeque<Listener> listeners = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<Runnable> runnables = new ConcurrentLinkedDeque<>();
 
     public void start() {
         //If this is a plot server, start the server listener.
@@ -37,6 +36,11 @@ public class NetworkHandler {
             this.connectToPlotServers();
         }
 
+        this.runnables.removeIf(runnable -> {
+           runnable.run();
+           return true;
+        });
+
         this.time++;
     }
 
@@ -49,10 +53,14 @@ public class NetworkHandler {
     }
 
     public void sendToAllPlotServers(Packet packet) {
-        this.listeners.removeIf(listener -> !listener.isConnected());
+        if(this.listeners.isEmpty())return;
 
-        this.listeners.forEach(listener -> {
-            listener.sendPacket(packet);
+        this.runnables.add(() -> {
+            this.listeners.removeIf(listener -> !listener.isConnected());
+
+            this.listeners.forEach(listener -> {
+                listener.sendPacket(packet);
+            });
         });
     }
 
