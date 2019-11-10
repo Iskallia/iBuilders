@@ -37,7 +37,11 @@ public class DataSchematics extends WorldSavedData {
 
     public List<BuildersSchematic.Info> getInfoFor(String playerUuid) {
         List<BuildersSchematic.Info> infoList = new ArrayList<>();
-        this.schematicsMap.get(playerUuid).forEach(schematic -> infoList.add(schematic.getInfo()));
+
+        if(this.schematicsMap.containsKey(playerUuid)) {
+            this.schematicsMap.get(playerUuid).forEach(schematic -> infoList.add(schematic.getInfo()));
+        }
+
         return infoList;
     }
 
