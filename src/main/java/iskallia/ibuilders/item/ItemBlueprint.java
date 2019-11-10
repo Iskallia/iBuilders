@@ -40,7 +40,7 @@ public class ItemBlueprint extends Item {
         }
 
         stackNBT.setTag("Schematic", schematicNBT);
-
+        schemaStack.setStackDisplayName(schematic.getInfo().getName());
         return schemaStack;
     }
 
