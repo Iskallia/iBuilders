@@ -5,6 +5,7 @@ import iskallia.ibuilders.net.packet.PacketC2SHandshake;
 import iskallia.ibuilders.net.packet.PacketRequestSchemaInfo;
 import iskallia.ibuilders.net.packet.PacketRequestSchematic;
 import iskallia.ibuilders.net.packet.PacketS2CDisconnect;
+import iskallia.ibuilders.net.packet.mc.C2SCreatorAction;
 import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
 import iskallia.ibuilders.net.packet.mc.S2CSchemaInfo;
 import iskallia.ibuilders.net.packet.util.PacketRegistry;
@@ -27,6 +28,7 @@ public class InitPacket {
     public static void registerMCPackets() {
         PIPELINE = NetworkRegistry.INSTANCE.newSimpleChannel(Builders.MOD_ID);
         PIPELINE.registerMessage(C2STerminalAction.Handler.class, C2STerminalAction.class, nextId(), Side.SERVER);
+        PIPELINE.registerMessage(C2SCreatorAction.Handler.class, C2SCreatorAction.class, nextId(), Side.SERVER);
         PIPELINE.registerMessage(S2CSchemaInfo.Handler.class, S2CSchemaInfo.class, nextId(), Side.CLIENT);
     }
 

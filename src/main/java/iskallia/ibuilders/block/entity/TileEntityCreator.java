@@ -32,8 +32,6 @@ public class TileEntityCreator extends TileEntity {
                 return stack.getItem() == iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER;
             } else if(slot == 1) {
                 return stack.getItem() == Items.PAPER;
-            } else if(slot == 2) {
-                return stack.getItem() == InitItem.BLUEPRINT;
             }
 
             return false;

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiContainerSchemaInfo extends GuiContainer {
+public abstract class GuiContainerSchemaInfo extends GuiContainer {
 
     protected int centerX;
     protected int centerY;
@@ -39,7 +39,6 @@ public class GuiContainerSchemaInfo extends GuiContainer {
         }
 
         this.updateInfoButtons();
-        InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.GET_INFO));
     }
 
     @Override
@@ -99,18 +98,17 @@ public class GuiContainerSchemaInfo extends GuiContainer {
     protected void actionPerformed(GuiButton button) throws IOException {
         for(int i = 0; i < this.infoButtons.length; i++) {
             if(button == this.infoButtons[i]) {
-
+                this.onInfoButtonPressed(i);
             } else if(button == this.deleteButtons[i]) {
-                BuildersSchematic.Info info = i + this.infoOffset >= this.infoList.size() ? null : this.infoList.get(i + this.infoOffset);
-
-                if(info != null) {
-                    InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.DELETE, info.getName()));
-                }
+                this.onDeleteButtonPressed(i);
             }
         }
 
         super.actionPerformed(button);
     }
+
+    protected abstract void onInfoButtonPressed(int index);
+    protected abstract void onDeleteButtonPressed(int index);
 
     public void setInfoList(List<BuildersSchematic.Info> infoList) {
         this.infoList = infoList;

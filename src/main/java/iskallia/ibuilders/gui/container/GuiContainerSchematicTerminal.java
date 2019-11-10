@@ -4,6 +4,7 @@ import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
 import iskallia.ibuilders.container.ContainerSchematicTerminal;
 import iskallia.ibuilders.init.InitPacket;
 import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
+import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,7 @@ public class GuiContainerSchematicTerminal extends GuiContainerSchemaInfo {
         super.initGui();
         this.addButton(this.uploadButton = new GuiButton(0, this.centerX - 180, this.centerY - 85, 60, 20, "UPLOAD"));
         this.updateUploadButton();
+        InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.GET_INFO));
     }
 
     @Override
@@ -45,6 +47,20 @@ public class GuiContainerSchematicTerminal extends GuiContainerSchemaInfo {
         }
 
         super.actionPerformed(button);
+    }
+
+    @Override
+    protected void onInfoButtonPressed(int index) {
+
+    }
+
+    @Override
+    protected void onDeleteButtonPressed(int index) {
+        BuildersSchematic.Info info = index + this.infoOffset >= this.infoList.size() ? null : this.infoList.get(index + this.infoOffset);
+
+        if(info != null) {
+            InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.DELETE, info.getName()));
+        }
     }
 
 }
