@@ -78,7 +78,13 @@ public class ItemBlueprint extends Item {
                 masterTileEntity.getPos(),
                 closestX, closestY, closestZ);
         schematic.setAuthor(player.getName());
-        schematic.getInfo().setName("TEST BUILD SCHEME"); // TODO
+
+        if(!heldStack.hasDisplayName()) {
+            schematic.getInfo().setName("TEST BUILD SCHEME"); // TODO
+        } else {
+            schematic.getInfo().setName(heldStack.getDisplayName());
+        }
+
         schematic.getInfo().setDescription("TEST DESCRIPTION"); // TODO
 
         ItemBlueprint.setSchematicNBT(heldStack, schematic);

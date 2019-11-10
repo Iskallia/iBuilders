@@ -35,6 +35,7 @@ public class EventMod {
             InitPacket.registerPackets();
         }
 
+        InitPacket.registerMCPackets();
         NetworkRegistry.INSTANCE.registerGuiHandler(Builders.getInstance(), new GuiHandler());
     }
 

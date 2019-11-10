@@ -56,9 +56,9 @@ public class BuildersSchematic extends SchematicBase {
 
     public static class Info {
         // TODO: private long dateUnix
-        private String name;
-        private String description;
-        private String author;
+        private String name = "";
+        private String description = "";
+        private String author = "";
 
         public String getName() {
             return name;
@@ -82,6 +82,17 @@ public class BuildersSchematic extends SchematicBase {
 
         public void setAuthor(String author) {
             this.author = author;
+        }
+
+        @Override
+        public String toString() {
+            String s = this.name;
+
+            if(!this.author.isEmpty()) {
+                s += " by " + this.author;
+            }
+
+            return s;
         }
     }
 

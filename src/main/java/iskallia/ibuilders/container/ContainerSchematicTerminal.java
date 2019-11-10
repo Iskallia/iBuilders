@@ -29,7 +29,7 @@ public class ContainerSchematicTerminal extends Container {
                 player.getHorizontalFacing()
         );
 
-        this.addSlotToContainer(new SlotItemHandler(this.pedestalInventory, 0, 0 ,0));
+        this.addSlotToContainer(new SlotItemHandler(this.pedestalInventory, 0, 0,0));
 
         for(int l = 0; l < 3; ++l) {
             for(int k = 0; k < 9; ++k) {

@@ -35,6 +35,12 @@ public class DataSchematics extends WorldSavedData {
         return infoList;
     }
 
+    public List<BuildersSchematic.Info> getInfoFor(String playerUuid) {
+        List<BuildersSchematic.Info> infoList = new ArrayList<>();
+        this.schematicsMap.get(playerUuid).forEach(schematic -> infoList.add(schematic.getInfo()));
+        return infoList;
+    }
+
     public List<BuildersSchematic> getSchematicsFor(String playerUuid) {
         if(!this.schematicsMap.containsKey(playerUuid))return Lists.newArrayList();
         return this.schematicsMap.get(playerUuid);
@@ -56,6 +62,10 @@ public class DataSchematics extends WorldSavedData {
         }
 
         return null;
+    }
+
+    public boolean hasSchematic(String playerUuid, String name) {
+        return this.getSchematic(playerUuid, name) != null;
     }
 
     public void addSchematic(String playerUuid, BuildersSchematic schematic) {
