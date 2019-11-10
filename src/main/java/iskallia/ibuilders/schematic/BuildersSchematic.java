@@ -56,20 +56,29 @@ public class BuildersSchematic extends SchematicBase {
 
     public static class Info {
         // TODO: private long dateUnix
+        private String uuid = "";
         private String name = "";
         private String description = "";
         private String author = "";
 
+        public String getUuid() {
+            return this.uuid;
+        }
+
         public String getName() {
-            return name;
+            return this.name;
         }
 
         public String getDescription() {
-            return description;
+            return this.description;
         }
 
         public String getAuthor() {
-            return author;
+            return this.author;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
         }
 
         public void setName(String name) {

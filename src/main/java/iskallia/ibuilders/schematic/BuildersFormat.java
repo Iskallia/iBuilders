@@ -97,6 +97,9 @@ public class BuildersFormat extends SchematicFormatBase {
             // Evaluate and put hash even before the input derived from user.
             tagCompound.setLong("Hash", hash(tagCompound));
 
+            if (info.getUuid() != null)
+                infoNBT.setString("Uuid", info.getUuid());
+
             if (info.getName() != null)
                 infoNBT.setString("Name", info.getName());
 
@@ -120,6 +123,9 @@ public class BuildersFormat extends SchematicFormatBase {
 
         if (tagCompound.hasKey("Info", Constants.NBT.TAG_COMPOUND)) {
             NBTTagCompound infoNBT = tagCompound.getCompoundTag("Info");
+
+            if (infoNBT.hasKey("Uuid", Constants.NBT.TAG_STRING))
+                buildersSchematic.getInfo().setUuid(infoNBT.getString("Uuid"));
 
             if (infoNBT.hasKey("Name", Constants.NBT.TAG_STRING))
                 buildersSchematic.getInfo().setName(infoNBT.getString("Name"));

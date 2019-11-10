@@ -88,9 +88,8 @@ public class Listener extends Thread {
         if(this.side == Side.CLIENT) {
             ClientContext clientContext = new ClientContext();
             clientContext.listener = this;
-            Log.warn(clientContext + ": " + this.contextCreatedConsumers.size());
+
             this.contextCreatedConsumers.forEach(contextConsumer -> {
-                Log.warn(contextConsumer);
                 contextConsumer.accept(clientContext);
             });
             return clientContext;
@@ -98,9 +97,8 @@ public class Listener extends Thread {
             ServerContext serverContext = new ServerContext();
             serverContext.serverListener = this.serverListener;
             serverContext.listener = this;
-            Log.warn(serverContext + ": " + this.contextCreatedConsumers.size());
+
             this.contextCreatedConsumers.forEach(contextConsumer -> {
-                Log.warn(contextConsumer);
                 contextConsumer.accept(serverContext);
             });
             return serverContext;

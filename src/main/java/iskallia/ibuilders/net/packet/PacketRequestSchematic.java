@@ -16,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 
+import java.util.UUID;
+
 public class PacketRequestSchematic extends Packet implements C2SMessage, S2CMessage {
 
     private String client;
@@ -61,7 +63,7 @@ public class PacketRequestSchematic extends Packet implements C2SMessage, S2CMes
 
         if(this.schematic != null) {
             context.minecraftServer.addScheduledTask(() -> {
-                EntityPlayerMP player = context.minecraftServer.getPlayerList().getPlayerByUsername(this.client);
+                EntityPlayerMP player = context.minecraftServer.getPlayerList().getPlayerByUUID(UUID.fromString(this.client));
                 Builders.LOG.warn("Checking player " + this.client);
                 if(player == null)return;
                 Builders.LOG.warn("Player exists " + player.getName());

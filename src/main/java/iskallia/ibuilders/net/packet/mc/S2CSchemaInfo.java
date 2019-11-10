@@ -34,6 +34,7 @@ public class S2CSchemaInfo implements IMessage {
 
         for(int i = 0; i < size; i++) {
             BuildersSchematic.Info info = new BuildersSchematic.Info();
+            info.setUuid(ByteBufUtils.readUTF8String(buf));
             info.setName(ByteBufUtils.readUTF8String(buf));
             info.setDescription(ByteBufUtils.readUTF8String(buf));
             info.setAuthor(ByteBufUtils.readUTF8String(buf));
@@ -47,6 +48,7 @@ public class S2CSchemaInfo implements IMessage {
         buf.writeShort(this.infoList.size());
 
         this.infoList.forEach(info -> {
+            ByteBufUtils.writeUTF8String(buf, info.getUuid());
             ByteBufUtils.writeUTF8String(buf, info.getName());
             ByteBufUtils.writeUTF8String(buf, info.getDescription());
             ByteBufUtils.writeUTF8String(buf, info.getAuthor());

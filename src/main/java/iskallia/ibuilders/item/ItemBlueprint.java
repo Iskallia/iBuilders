@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import org.jline.utils.Log;
 import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
@@ -77,6 +78,8 @@ public class ItemBlueprint extends Item {
         BuildersSchematic schematic = BlockMarker.getSchematic(world,
                 masterTileEntity.getPos(),
                 closestX, closestY, closestZ);
+
+        schematic.getInfo().setUuid(player.getUniqueID().toString());
         schematic.setAuthor(player.getName());
 
         if(!heldStack.hasDisplayName()) {
