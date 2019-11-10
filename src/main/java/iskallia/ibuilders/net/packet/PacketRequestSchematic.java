@@ -49,28 +49,20 @@ public class PacketRequestSchematic extends Packet implements C2SMessage, S2CMes
         World overworld = context.minecraftServer.worlds[DimensionType.OVERWORLD.getId()];
         DataSchematics dataSchematics = DataSchematics.get(overworld);
         BuildersSchematic schematic = dataSchematics.getSchematic(this.playerUuid, this.name);
-        dataSchematics.getAllInfo().forEach(System.out::println);
-        dataSchematics.getSchematicsFor(this.playerUuid).forEach(System.out::println);
-        dataSchematics.getInfoFor(this.playerUuid).forEach(System.out::println);
-        Builders.LOG.warn("Sending " + schematic + " [" + this.playerUuid + ", " + this.name + "]");
         return new PacketRequestSchematic(this.client, this.playerUuid, this.name, schematic);
     }
 
     //On received on the live server.
     @Override
     public Packet onPacketReceived(ClientContext context) {
-        Builders.LOG.warn("Received " + schematic);
-
         if(this.schematic != null) {
             context.minecraftServer.addScheduledTask(() -> {
                 EntityPlayerMP player = context.minecraftServer.getPlayerList().getPlayerByUUID(UUID.fromString(this.client));
-                Builders.LOG.warn("Checking player " + this.client);
                 if(player == null)return;
-                Builders.LOG.warn("Player exists " + player.getName());
+
                 Container container = player.openContainer;
 
                 if(container instanceof ContainerCreator) {
-                    Builders.LOG.warn("Found container");
                     ContainerCreator creator = (ContainerCreator)container;
 
                     ItemStack paper = creator.inventorySlots.get(1).getStack();
