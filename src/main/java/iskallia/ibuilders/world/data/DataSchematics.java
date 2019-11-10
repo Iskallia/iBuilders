@@ -1,6 +1,7 @@
 package iskallia.ibuilders.world.data;
 
 import com.google.common.collect.Lists;
+import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,6 +31,9 @@ public class DataSchematics extends WorldSavedData {
     }
 
     public List<BuildersSchematic.Info> getAllInfo() {
+        Builders.LOG.warn(this.schematicsMap);
+        Builders.LOG.warn(this.schematicsMap.keySet());
+        Builders.LOG.warn(this.schematicsMap.values());
         List<BuildersSchematic.Info> infoList = new ArrayList<>();
         this.schematicsMap.values().forEach(schematics -> schematics.forEach(schematic -> infoList.add(schematic.getInfo())));
         return infoList;
@@ -133,6 +137,11 @@ public class DataSchematics extends WorldSavedData {
 
         compound.setTag("SchematicEntries", schematicEntries);
         return compound;
+    }
+
+    @Override
+    public boolean isDirty() {
+        return true;
     }
 
     public static DataSchematics get(World world) {

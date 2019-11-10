@@ -59,7 +59,7 @@ public class GuiContainerSchematicTerminal extends GuiContainerSchemaInfo {
         BuildersSchematic.Info info = index + this.infoOffset >= this.infoList.size() ? null : this.infoList.get(index + this.infoOffset);
 
         if(info != null) {
-            InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.DELETE, info.getName()));
+            InitPacket.PIPELINE.sendToServer(new C2STerminalAction(C2STerminalAction.Action.DELETE, info.getUuid(), info.getName()));
         }
     }
 

@@ -18,8 +18,6 @@ public class SchematicBase implements ISchematic {
 
     private final short[][][] blocks;
     private final byte[][][] metadata;
-    private final List<TileEntity> tileEntities = new ArrayList<TileEntity>();
-    private final List<Entity> entities = new ArrayList<Entity>();
     private final int width;
     private final int height;
     private final int length;
@@ -82,65 +80,34 @@ public class SchematicBase implements ISchematic {
 
     @Override
     public TileEntity getTileEntity(final BlockPos pos) {
-        for (final TileEntity tileEntity : this.tileEntities) {
-            if (tileEntity.getPos().equals(pos)) {
-                return tileEntity;
-            }
-        }
-
         return null;
     }
 
     @Override
     public List<TileEntity> getTileEntities() {
-        return this.tileEntities;
+        return new ArrayList<>();
     }
 
     @Override
     public void setTileEntity(final BlockPos pos, final TileEntity tileEntity) {
-        if (!isValid(pos)) {
-            return;
-        }
-
-        removeTileEntity(pos);
-
-        if (tileEntity != null) {
-            this.tileEntities.add(tileEntity);
-        }
     }
 
     @Override
     public void removeTileEntity(final BlockPos pos) {
-        this.tileEntities.removeIf(tileEntity -> tileEntity.getPos().equals(pos));
+
     }
 
     @Override
     public List<Entity> getEntities() {
-        return this.entities;
+        return new ArrayList<>();
     }
 
     @Override
     public void addEntity(final Entity entity) {
-        if (entity == null || entity.getUniqueID() == null || entity instanceof EntityPlayer) {
-            return;
-        }
-
-        for (final Entity e : this.entities) {
-            if (entity.getUniqueID().equals(e.getUniqueID())) {
-                return;
-            }
-        }
-
-        this.entities.add(entity);
     }
 
     @Override
     public void removeEntity(final Entity entity) {
-        if (entity == null || entity.getUniqueID() == null) {
-            return;
-        }
-
-        this.entities.removeIf(e -> entity.getUniqueID().equals(e.getUniqueID()));
     }
 
     @Override

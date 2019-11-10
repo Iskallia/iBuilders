@@ -36,7 +36,7 @@ public class GuiContainerCreator extends GuiContainerSchemaInfo {
         BuildersSchematic.Info info = index + this.infoOffset >= this.infoList.size() ? null : this.infoList.get(index + this.infoOffset);
 
         if(info != null) {
-            InitPacket.PIPELINE.sendToServer(new C2SCreatorAction(C2SCreatorAction.Action.PRINT, info.getName()));
+            InitPacket.PIPELINE.sendToServer(new C2SCreatorAction(C2SCreatorAction.Action.PRINT, info.getUuid(), info.getName()));
         }
     }
 

@@ -12,7 +12,7 @@ public class EventServer {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if(event.phase == TickEvent.Phase.START && FMLCommonHandler.instance().getSide().isServer()) {
-            Builders.NETWORK.tick();
+            Builders.NETWORK.tick(FMLCommonHandler.instance().getMinecraftServerInstance());
         }
     }
 

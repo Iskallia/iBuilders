@@ -83,7 +83,7 @@ public class C2STerminalAction implements IMessage {
 
                     return new S2CSchemaInfo(S2CSchemaInfo.Action.OVERWRITE, dataSchematics.getInfoFor(playerUuid));
                 } else if(message.action == Action.DELETE) {
-                    dataSchematics.removeSchematic(playerUuid, message.args[0]);
+                    dataSchematics.removeSchematic(message.args[0], message.args[1]);
                     return new S2CSchemaInfo(S2CSchemaInfo.Action.OVERWRITE, dataSchematics.getInfoFor(playerUuid));
                 }
             }

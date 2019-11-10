@@ -7,6 +7,7 @@ import iskallia.ibuilders.net.context.ServerContext;
 import iskallia.ibuilders.net.packet.Packet;
 import iskallia.ibuilders.net.packet.util.PacketHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import org.jline.utils.Log;
 
 import javax.management.AttributeList;
 import java.io.BufferedInputStream;
@@ -87,13 +88,21 @@ public class Listener extends Thread {
         if(this.side == Side.CLIENT) {
             ClientContext clientContext = new ClientContext();
             clientContext.listener = this;
-            this.contextCreatedConsumers.forEach(contextConsumer -> contextConsumer.accept(clientContext));
+            Log.warn(clientContext + ": " + this.contextCreatedConsumers.size());
+            this.contextCreatedConsumers.forEach(contextConsumer -> {
+                Log.warn(contextConsumer);
+                contextConsumer.accept(clientContext);
+            });
             return clientContext;
         } else if(this.side == Side.SERVER) {
             ServerContext serverContext = new ServerContext();
             serverContext.serverListener = this.serverListener;
             serverContext.listener = this;
-            this.contextCreatedConsumers.forEach(contextConsumer -> contextConsumer.accept(serverContext));
+            Log.warn(serverContext + ": " + this.contextCreatedConsumers.size());
+            this.contextCreatedConsumers.forEach(contextConsumer -> {
+                Log.warn(contextConsumer);
+                contextConsumer.accept(serverContext);
+            });
             return serverContext;
         }
 

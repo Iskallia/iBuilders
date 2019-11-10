@@ -7,6 +7,7 @@ import iskallia.ibuilders.container.ContainerSchematicTerminal;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.item.ItemBlueprint;
 import iskallia.ibuilders.net.packet.PacketRequestSchemaInfo;
+import iskallia.ibuilders.net.packet.PacketRequestSchematic;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.world.data.DataSchematics;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -73,20 +74,24 @@ public class C2SCreatorAction implements IMessage {
                     Builders.NETWORK.sendToAllPlotServers(new PacketRequestSchemaInfo());
                     return new S2CSchemaInfo(S2CSchemaInfo.Action.OVERWRITE, dataSchematics.getAllInfo());
                 } else if(message.action == Action.PRINT) {
-                    ContainerCreator schematicTerminal = (ContainerCreator)container;
-                    ItemStack paper = schematicTerminal.inventorySlots.get(1).getStack();
+                    ContainerCreator creator = (ContainerCreator)container;
+                    ItemStack paper = creator.inventorySlots.get(1).getStack();
 
                     if(!paper.isEmpty() && paper.getItem() == Items.PAPER) {
-                        ItemStack currentBlueprint = schematicTerminal.inventorySlots.get(2).getStack();
-                        BuildersSchematic schematic = dataSchematics.getSchematic(playerUuid, message.args[0]);
+                        ItemStack currentBlueprint = creator.inventorySlots.get(2).getStack();
+                        BuildersSchematic schematic = dataSchematics.getSchematic(message.args[0], message.args[1]);
 
-                        if(currentBlueprint.isEmpty() && schematic != null) {
-                            ItemStack blueprint = new ItemStack(InitItem.BLUEPRINT, 1);
-                            ItemBlueprint.setSchematicNBT(blueprint, schematic);
-                            schematicTerminal.putStackInSlot(2, blueprint);
-                            paper.shrink(1);
-                            schematicTerminal.putStackInSlot(1, paper);
-                            schematicTerminal.detectAndSendChanges();
+                        if(currentBlueprint.isEmpty()) {
+                            if(schematic != null) {
+                                ItemStack blueprint = new ItemStack(InitItem.BLUEPRINT, 1);
+                                ItemBlueprint.setSchematicNBT(blueprint, schematic);
+                                creator.putStackInSlot(2, blueprint);
+                                paper.shrink(1);
+                                creator.putStackInSlot(1, paper);
+                                creator.detectAndSendChanges();
+                            } else {
+                                Builders.NETWORK.sendToAllPlotServers(new PacketRequestSchematic(playerUuid, message.args[0], message.args[1]));
+                            }
                         }
                     }
                 }

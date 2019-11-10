@@ -4,8 +4,11 @@ import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.init.InitConfig;
 import iskallia.ibuilders.net.connection.Listener;
 import iskallia.ibuilders.net.connection.ServerListener;
+import iskallia.ibuilders.net.context.ClientContext;
+import iskallia.ibuilders.net.context.ServerContext;
 import iskallia.ibuilders.net.packet.Packet;
 import iskallia.ibuilders.net.packet.PacketC2SHandshake;
+import net.minecraft.server.MinecraftServer;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -27,13 +30,13 @@ public class NetworkHandler {
         this.hasStarted = true;
     }
 
-    public void tick() {
+    public void tick(MinecraftServer server) {
         if(!this.hasStarted) {
             throw new IllegalStateException("NetworkHandler hasn't been initialized!");
         }
 
         if(this.time % (20 * 20) == 0) {
-            this.connectToPlotServers();
+            this.connectToPlotServers(server);
         }
 
         this.runnables.removeIf(runnable -> {
@@ -76,7 +79,7 @@ public class NetworkHandler {
         Builders.LOG.warn("Listener started and is awaiting.");
     }
 
-    private void connectToPlotServers() {
+    private void connectToPlotServers(MinecraftServer server) {
         //If the connection is lost, remove the listener from the list.
         this.listeners.removeIf(listener -> !listener.isConnected());
 
@@ -100,6 +103,14 @@ public class NetworkHandler {
                 listener.onConnectionEstablished(connectedListener -> {
                     Builders.LOG.warn("Successfully connected to plot server [" + connectedListener.getConnectionAddress() + "]!");
                     connectedListener.sendPacket(new PacketC2SHandshake());
+                });
+
+                listener.onContextCreated(context -> {
+                    if(context instanceof ServerContext) {
+                        ((ServerContext)context).minecraftServer = server;
+                    } else if(context instanceof ClientContext) {
+                        ((ClientContext)context).minecraftServer = server;
+                    }
                 });
 
                 this.listeners.add(listener);
