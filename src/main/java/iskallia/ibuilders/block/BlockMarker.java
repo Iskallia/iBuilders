@@ -30,9 +30,9 @@ import javax.annotation.Nullable;
 
 public class BlockMarker extends BlockDirectional {
 
-    public static final int Z_LIMIT = 10;
-    public static final int X_LIMIT = 10;
-    public static final int Y_LIMIT = 10;
+    public static final int Z_LIMIT = 64;
+    public static final int X_LIMIT = 64;
+    public static final int Y_LIMIT = 64;
 
     protected static final AxisAlignedBB VERTICAL_AABB = new AxisAlignedBB(0.375D, 0.0D, 0.375D, 0.625D, 1.0D, 0.625D);
     protected static final AxisAlignedBB NS_AABB = new AxisAlignedBB(0.375D, 0.375D, 0.0D, 0.625D, 0.625D, 1.0D);
