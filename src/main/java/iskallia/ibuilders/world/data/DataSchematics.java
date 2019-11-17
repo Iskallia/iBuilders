@@ -31,9 +31,6 @@ public class DataSchematics extends WorldSavedData {
     }
 
     public List<BuildersSchematic.Info> getAllInfo() {
-        Builders.LOG.warn(this.schematicsMap);
-        Builders.LOG.warn(this.schematicsMap.keySet());
-        Builders.LOG.warn(this.schematicsMap.values());
         List<BuildersSchematic.Info> infoList = new ArrayList<>();
         this.schematicsMap.values().forEach(schematics -> schematics.forEach(schematic -> infoList.add(schematic.getInfo())));
         return infoList;
