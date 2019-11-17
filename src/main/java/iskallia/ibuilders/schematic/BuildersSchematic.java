@@ -1,6 +1,7 @@
 package iskallia.ibuilders.schematic;
 
 import com.github.lunatrius.schematica.nbt.NBTHelper;
+import com.github.lunatrius.schematica.world.storage.Schematic;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -18,6 +19,10 @@ public class BuildersSchematic extends SchematicBase {
 
     public BuildersSchematic(int width, int height, int length) {
         super(width, height, length);
+    }
+
+    public void setInfo(Info info) {
+        this.info = info;
     }
 
     public Info getInfo() {
@@ -54,6 +59,27 @@ public class BuildersSchematic extends SchematicBase {
         TileEntity schematicTE = NBTHelper.readTileEntityFromCompound(tileEntityNBT);
         schematicTE.setPos(pos);
         super.setTileEntity(pos, schematicTE);
+    }
+
+    public static BuildersSchematic fromDefaultSchematic(Schematic defaultSchematic) {
+        BuildersSchematic schematic = new BuildersSchematic(
+                defaultSchematic.getWidth(),
+                defaultSchematic.getHeight(),
+                defaultSchematic.getLength()
+        );
+
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+        for(int i = 0; i < defaultSchematic.getWidth(); i++) {
+            for(int j = 0; j < defaultSchematic.getHeight(); j++) {
+                for(int k = 0; k < defaultSchematic.getLength(); k++) {
+                    pos.setPos(i, j, k);
+                    schematic.setBlockState(pos, defaultSchematic.getBlockState(pos));
+                }
+            }
+        }
+
+        return schematic;
     }
 
     public static BuildersSchematic fromBytes(ByteBuf buf) {
