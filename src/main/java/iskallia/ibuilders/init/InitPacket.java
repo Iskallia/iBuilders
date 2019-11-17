@@ -7,6 +7,7 @@ import iskallia.ibuilders.net.packet.PacketRequestSchematic;
 import iskallia.ibuilders.net.packet.PacketS2CDisconnect;
 import iskallia.ibuilders.net.packet.mc.C2SCreatorAction;
 import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
+import iskallia.ibuilders.net.packet.mc.S2CRenderSchematics;
 import iskallia.ibuilders.net.packet.mc.S2CSchemaInfo;
 import iskallia.ibuilders.net.packet.util.PacketRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -30,6 +31,7 @@ public class InitPacket {
         PIPELINE.registerMessage(C2STerminalAction.Handler.class, C2STerminalAction.class, nextId(), Side.SERVER);
         PIPELINE.registerMessage(C2SCreatorAction.Handler.class, C2SCreatorAction.class, nextId(), Side.SERVER);
         PIPELINE.registerMessage(S2CSchemaInfo.Handler.class, S2CSchemaInfo.class, nextId(), Side.CLIENT);
+        PIPELINE.registerMessage(S2CRenderSchematics.Handler.class, S2CRenderSchematics.class, nextId(), Side.CLIENT);
     }
 
     private static int nextId() {

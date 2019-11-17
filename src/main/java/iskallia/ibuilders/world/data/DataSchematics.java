@@ -145,7 +145,9 @@ public class DataSchematics extends WorldSavedData {
     }
 
     public static DataSchematics get(World world) {
-        DataSchematics data = (DataSchematics)world.getMapStorage().getOrLoadData(DataSchematics.class, DATA_NAME);
+        DataSchematics data = (DataSchematics)world
+                .getMapStorage()
+                .getOrLoadData(DataSchematics.class, DATA_NAME);
 
         if(data == null) {
             data = new DataSchematics();
