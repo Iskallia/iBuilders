@@ -3,10 +3,7 @@ package iskallia.ibuilders.event;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.gui.GuiHandler;
-import iskallia.ibuilders.init.InitConfig;
-import iskallia.ibuilders.init.InitModel;
-import iskallia.ibuilders.init.InitPacket;
-import iskallia.ibuilders.init.InitSchematic;
+import iskallia.ibuilders.init.*;
 import iskallia.ibuilders.net.context.ClientContext;
 import iskallia.ibuilders.net.context.ServerContext;
 import iskallia.ibuilders.schematic.BuildersFormat;
@@ -26,8 +23,11 @@ public class EventMod {
 
     public static void onPreInitialization(FMLPreInitializationEvent event) {
         if(event.getSide() == Side.CLIENT) {
+            InitEntity.registerEntityRenderers();
             InitModel.registerTileEntityRenderers();
         }
+
+        InitEntity.registerEntities();
     }
 
     public static void onInitialization(FMLInitializationEvent event) {
