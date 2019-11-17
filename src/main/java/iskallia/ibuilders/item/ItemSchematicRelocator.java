@@ -34,11 +34,10 @@ public class ItemSchematicRelocator extends Item {
         ItemStack heldStack = player.getHeldItem(hand);
         TileEntity tileEntity = world.getTileEntity(pos);
 
-        if(player.isSneaking()) {
+        if(!player.isSneaking()) {
             if(tileEntity instanceof TileEntityCreator) {
                 heldStack.setTagInfo("Creator", new NBTTagLong(pos.toLong()));
                 player.sendStatusMessage(new TextComponentTranslation("use.schematic_relocator.bound.success"), true);
-                return EnumActionResult.SUCCESS;
             } else {
                 player.sendStatusMessage(new TextComponentTranslation("use.schematic_relocator.bound.fail"), true);
             }

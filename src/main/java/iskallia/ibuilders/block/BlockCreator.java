@@ -4,6 +4,7 @@ import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
 import iskallia.ibuilders.gui.GuiHandler;
+import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -66,7 +67,7 @@ public class BlockCreator extends Block implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if(!player.isSneaking()) {
+        if(hand == EnumHand.MAIN_HAND && !player.isSneaking() && player.getHeldItem(hand).getItem() != InitItem.SCHEMATIC_RELOCATOR) {
             player.openGui(Builders.getInstance(), GuiHandler.CREATOR, world, pos.getX(), pos.getY(), pos.getZ());
             return true;
         }
