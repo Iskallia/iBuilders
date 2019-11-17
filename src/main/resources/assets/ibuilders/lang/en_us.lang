@@ -12,3 +12,11 @@ tile.schema_marker.name=Schema Marker
 use.block_marker.success=§aSuccessfully connected markers!
 use.block_marker.failure=§4Failed to connect markers..
 use.block_marker.disconnected=§3Disconnected markers
+
+# Schematic Translocator
+use.schematic_relocator.bound.success=§aRelocator successfully bound!
+use.schematic_relocator.bound.fail=§3Cannot bind to this block...
+use.schematic_relocator.move.successful=§aMoved the schematic successfully!
+use.schematic_relocator.move.fail=§4Relocator isn't bound to anything!
+use.schematic_relocator.move.lost=§3Lost connection to the creator...
+use.schematic_relocator.move.far=§3Too far away!

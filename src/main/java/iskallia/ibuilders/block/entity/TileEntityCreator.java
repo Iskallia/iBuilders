@@ -1,5 +1,7 @@
 package iskallia.ibuilders.block.entity;
 
+import com.github.lunatrius.schematica.client.util.RotationHelper;
+import com.github.lunatrius.schematica.world.storage.Schematic;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
@@ -11,7 +13,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -39,6 +40,8 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 return stack.getItem() == iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER;
             } else if(slot == 1) {
                 return stack.getItem() == Items.PAPER;
+            } else if(slot == 2) {
+                return stack.getItem() == InitItem.BLUEPRINT;
             }
 
             return false;
@@ -49,6 +52,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     private BlockPos offset;
     private SchematicTracker schematicTracker;
     private ItemStack lastBlueprint;
+    private BuildersSchematic rawSchematic;
 
     public TileEntityCreator() {
 
@@ -59,6 +63,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     }
 
     public void setSchematic(BuildersSchematic schematic) {
+        this.rawSchematic = schematic;
         this.schematic = schematic;
 
         if(this.schematicTracker == null) {
@@ -66,10 +71,46 @@ public class TileEntityCreator extends TileEntity implements ITickable {
         }
 
         if(this.schematic == null) {
-            this.offset = BlockPos.ORIGIN.add(1, 1, 1);
+            this.offset = BlockPos.ORIGIN.add(0, 1, 0);
         }
 
         this.schematicTracker.updateCreator(this);
+    }
+
+    public void setTransform(BlockPos offset, EnumFacing axis) {
+        if(this.rawSchematic == null)return;
+        this.offset = BlockPos.ORIGIN.add(0, 1, 0).add(offset);
+
+        if(axis == EnumFacing.EAST) {
+            this.schematic = this.rawSchematic;
+        } else if(axis == EnumFacing.WEST) {
+            this.schematic = this.rotateSchematic(this.rawSchematic, EnumFacing.DOWN);
+            this.schematic = this.rotateSchematic(this.schematic, EnumFacing.DOWN);
+            this.offset = this.offset.add(-this.rawSchematic.getWidth() + 1,0,-this.rawSchematic.getLength() + 1);
+        } else if(axis == EnumFacing.SOUTH) {
+            this.schematic = this.rotateSchematic(this.rawSchematic, EnumFacing.UP);
+            this.offset = this.offset.add(-this.rawSchematic.getLength() + 1,0,0);
+        } else if(axis == EnumFacing.NORTH) {
+            this.schematic = this.rotateSchematic(this.rawSchematic, EnumFacing.DOWN);
+            this.offset = this.offset.add(0,0, -this.rawSchematic.getWidth() + 1);
+        }
+
+        this.schematicTracker.getAndSetChanged(true);
+    }
+
+    private BuildersSchematic rotateSchematic(BuildersSchematic schematic, EnumFacing axis) {
+        if(axis != null) {
+            try {
+                Schematic rotatedSchematic = RotationHelper.INSTANCE.rotate(schematic, axis, true);
+                BuildersSchematic newSchematic = BuildersSchematic.fromDefaultSchematic(rotatedSchematic);
+                newSchematic.setInfo(schematic.getInfo());
+                return newSchematic;
+            } catch (RotationHelper.RotationException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return this.rawSchematic;
     }
 
     @Override
