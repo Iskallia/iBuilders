@@ -16,11 +16,11 @@ import java.util.List;
 
 public class SchematicBase implements ISchematic {
 
-    private final short[][][] blocks;
-    private final byte[][][] metadata;
-    private final int width;
-    private final int height;
-    private final int length;
+    final short[][][] blocks;
+    final byte[][][] metadata;
+    final int width;
+    final int height;
+    final int length;
     private String author;
 
     public SchematicBase(final int width, final int height, final int length) {
