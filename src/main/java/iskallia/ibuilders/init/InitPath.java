@@ -1,6 +1,7 @@
 package iskallia.ibuilders.init;
 
 import iskallia.ibuilders.entity.path.agent.Agent;
+import iskallia.ibuilders.entity.path.agent.AgentLinear;
 import net.minecraft.block.Block;
 
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ public class InitPath {
     public static Set<Block> STEP_ON_BLOCKS = new HashSet<Block>();
 
     static {
+        AGENTS.add(new AgentLinear());
+
         for(Block block: Block.REGISTRY) {
             if(block.canSpawnInBlock()) {
                 GO_THROUGH_BLOCKS.add(block);
