@@ -14,6 +14,7 @@ public class InitModel {
     public static void registerItemModels() {
         registerSimpleItemModel(InitItem.BLUEPRINT, 0);
         registerSimpleItemModel(InitItem.SCHEMATIC_RELOCATOR, 0);
+        registerSimpleItemModel(InitItem.SPAWN_EGG_BUILDER, 0);
 
         registerSimpleItemModel(InitBlock.ITEM_MARKER, 0);
     }
