@@ -1,6 +1,5 @@
 package iskallia.ibuilders.entity.path;
 
-import iskallia.ibuilders.entity.path.agent.Agent;
 import net.minecraft.util.math.BlockPos;
 
 public class Node {
