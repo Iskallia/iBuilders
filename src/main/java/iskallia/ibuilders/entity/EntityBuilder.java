@@ -1,30 +1,36 @@
 package iskallia.ibuilders.entity;
 
+import com.mojang.authlib.GameProfile;
 import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.util.MaterialList;
+import iskallia.itraders.entity.FakeUser;
 import iskallia.itraders.util.profile.SkinProfile;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.GameType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public class EntityBuilder extends EntityCreature {
 
+    public FakeUser fakeUser;
     public SkinProfile skin;
     private String lastName = "Builder";
     protected BuilderPathFinder pathFinder;
 
     private TileEntityCreator creator;
     private int placeBlockDelay;
+    private int blocksLeft = 10;
 
     public EntityBuilder(World world) {
         super(world);
@@ -33,6 +39,8 @@ public class EntityBuilder extends EntityCreature {
             this.skin = new SkinProfile();
         } else {
             this.pathFinder = new BuilderPathFinder(this);
+            this.fakeUser = new FakeUser((WorldServer)this.world, new GameProfile(null, this.lastName));
+            this.fakeUser.setGameType(GameType.CREATIVE);
         }
 
         this.setCustomNameTag(this.lastName);
@@ -89,7 +97,9 @@ public class EntityBuilder extends EntityCreature {
         if(pos == null)return;
 
         if(this.getBuildState() != null) {
-            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget()));
+            ItemStack stack = MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget());
+            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack);
+            this.fakeUser.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack);
         }
 
         if(pos.distanceSq(this.getPosition()) > 3 * 3)return;
@@ -97,12 +107,21 @@ public class EntityBuilder extends EntityCreature {
         IBlockState state = this.world.getBlockState(pos);
 
         if(this.isAirOrLiquid(state) && this.getBuildState() != null) {
+            for(EnumFacing facing: EnumFacing.values()) {
+                this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND).onItemUse(this.fakeUser, this.world, pos, EnumHand.MAIN_HAND, facing, 0, 0, 0);
+            }
+
             this.world.setBlockState(pos, this.getBuildState());
+            this.getBuildState().getBlock().onBlockAdded(this.world, pos, this.getBuildState());
             SoundType type = this.getBuildState().getBlock().getSoundType(state, this.world, pos, this);
             this.world.playSound(null, pos, type.getPlaceSound(), SoundCategory.BLOCKS, type.getVolume(), type.getPitch());
             this.swingArm(EnumHand.MAIN_HAND);
             this.pathFinder.reset();
             this.placeBlockDelay = 5;
+
+            if(--this.blocksLeft == 0) {
+                this.setDead();
+            }
         }
     }
 
@@ -156,6 +175,10 @@ public class EntityBuilder extends EntityCreature {
 
     public void setCreator(TileEntityCreator creator) {
         this.creator = creator;
+    }
+
+    public void setBlocksLeft(int blocksLeft) {
+        this.blocksLeft = blocksLeft;
     }
 
     public BlockPos getBuildTarget() {
