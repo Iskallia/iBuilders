@@ -1,14 +1,27 @@
 package iskallia.ibuilders.client;
 
+import com.github.lunatrius.core.client.renderer.GeometryMasks;
+import com.github.lunatrius.core.client.renderer.GeometryTessellator;
 import com.github.lunatrius.schematica.api.ISchematic;
+import com.github.lunatrius.schematica.client.world.SchematicWorld;
+import com.github.lunatrius.schematica.handler.ConfigurationHandler;
 import com.github.lunatrius.schematica.proxy.ClientProxy;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -50,6 +63,41 @@ public class MegaSchematic implements ISchematic {
                 schematicWrapper.pos.y + schematicWrapper.schematic.getHeight(),
                 schematicWrapper.pos.z + schematicWrapper.schematic.getLength()
         );
+    }
+
+    public void renderOutlines() {
+        /*
+        for(SchematicWrapper schematicWrapper: this.schematics) {
+            ISchematic schematic = schematicWrapper.schematic;
+            BlockPos pos1 = schematicWrapper.getPosition();
+            BlockPos pos2 = pos1.add(schematic.getWidth(), schematic.getHeight(), schematic.getLength());
+
+            Entity cam = Minecraft.getMinecraft().getRenderViewEntity();
+            Vec3d camPos = new Vec3d(cam.posX, cam.posY, cam.posZ);
+
+            GlStateManager.glLineWidth(2.0f);
+            Tessellator.getInstance().getBuffer().begin(3, DefaultVertexFormats.POSITION_COLOR);
+
+            this.putVertex(camPos, pos1);
+            this.putVertex(camPos, pos2);
+
+            Tessellator.getInstance().draw();
+        }*/
+    }
+
+    protected void putVertex(Vec3d camPos, BlockPos pos) {
+        for(int i = 0; i < 2; i++) {
+            Tessellator.getInstance().getBuffer().pos(
+                    pos.getX() - camPos.x,
+                    pos.getY() - camPos.y,
+                    pos.getZ() - camPos.z
+            ).color(
+                    1.0f,
+                    1.0f,
+                    1.0f,
+                    1.0f
+            ).endVertex();
+        }
     }
 
     public static class SchematicWrapper {
