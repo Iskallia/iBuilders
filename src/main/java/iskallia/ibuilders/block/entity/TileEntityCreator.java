@@ -2,11 +2,11 @@ package iskallia.ibuilders.block.entity;
 
 import com.github.lunatrius.schematica.client.util.RotationHelper;
 import com.github.lunatrius.schematica.world.storage.Schematic;
-import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.entity.EntityBuilder;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
+import iskallia.ibuilders.util.Pair;
 import iskallia.ibuilders.world.data.SchematicTracker;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,6 +24,9 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TileEntityCreator extends TileEntity implements ITickable {
 
@@ -59,25 +62,25 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     private BuildersSchematic rawSchematic;
 
     private int layer;
-    private BlockPos pendingBlock;
-    private EntityBuilder builder;
-    private IBlockState expectedState;
+    private List<EntityBuilder> builders = new ArrayList<>();
+    private List<Pair<BlockPos, IBlockState>> pendingBlocks = new ArrayList<>();
+    private int builderCount = 5;
 
     public TileEntityCreator() {
 
     }
 
     public BuildersSchematic getSchematic() {
-        if(this.pendingBlock == null) {
+        if(this.pendingBlocks.isEmpty()) {
             return this.schematic;
         }
 
-        BuildersSchematic layeredSchematic = new BuildersSchematic(this.schematic.getWidth(), this.schematic.getHeight(), this.schematic.getLength());
+        BuildersSchematic layeredSchematic = new BuildersSchematic(this.schematic.getWidth(), 1, this.schematic.getLength());
 
         for(int x = 0; x < this.schematic.getWidth(); x++) {
             for(int z = 0; z < this.schematic.getLength(); z++) {
-                BlockPos pos = new BlockPos(x, this.layer, z);
-                layeredSchematic.setBlockState(pos, this.schematic.getBlockState(pos));
+                BlockPos pos = new BlockPos(x, 0, z);
+                layeredSchematic.setBlockState(pos, this.schematic.getBlockState(pos.offset(EnumFacing.UP, this.layer)));
             }
         }
 
@@ -114,8 +117,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
         }
 
         this.schematicTracker.getAndSetChanged(true);
-        this.pendingBlock = null;
-        Builders.LOG.warn("Set pending block to " + this.pendingBlock + "!");
+        this.pendingBlocks.clear();
     }
 
     private BuildersSchematic rotateSchematic(BuildersSchematic schematic, EnumFacing axis) {
@@ -171,6 +173,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
     @Override
     public void update() {
+        if(this.world.isRemote)return;
         ItemStack blueprint = this.inventory.getStackInSlot(2);
 
         if(blueprint != this.lastBlueprint) {
@@ -183,25 +186,25 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
         this.inventory.setStackInSlot(2, blueprint);
         this.lastBlueprint = blueprint;
+        this.builderCount = 3;
+
         this.updatePendingBlock();
-        this.updateBuilderEntity();
+        this.updateBuilders();
     }
 
     private void updatePendingBlock() {
-        if(this.schematic == null)return;
+        if(this.schematic == null || this.offset == null)return;
 
-        if(this.pendingBlock == null) {
-            for(this.layer = 0; this.layer < this.schematic.getHeight(); this.layer++) {
+        int pendingBlocksCount = (int)this.pendingBlocks.stream().filter(pendingBlock -> pendingBlock.getKey() != null).count();
 
-                int dLowX = Math.abs(this.pos.getX() + this.offset.getX() - this.builder.getPosition().getX());
-                int dHighX = Math.abs(this.pos.getX() + this.offset.getX() + this.schematic.getWidth() - this.builder.getPosition().getX());
-                int xSignum = dLowX < dHighX ? 1 : -1;
-                int dLowZ = Math.abs(this.pos.getZ() + this.offset.getZ() - this.builder.getPosition().getZ());
-                int dHighZ = Math.abs(this.pos.getZ() + this.offset.getZ() + this.schematic.getLength() - this.builder.getPosition().getZ());
-                int zSignum = dLowZ < dHighZ ? 1 : -1;
+        if(pendingBlocksCount < this.builderCount) {
+            List<Pair<BlockPos, IBlockState>> blocksNeeded = new ArrayList<>();
+            boolean placed = false;
+            int startLayer = this.layer;
 
-                for(int x = xSignum == 1 ? 0 : this.schematic.getWidth() - 1; x < this.schematic.getWidth() && x >= 0; x += xSignum) {
-                    for(int z = zSignum == 1 ? 0 : this.schematic.getLength() - 1; z < this.schematic.getLength() && z >= 0; z += zSignum) {
+            for(this.layer = 0; this.layer < this.schematic.getHeight() && !placed; this.layer++) {
+                for(int x = 0; x < this.schematic.getWidth(); x += 1) {
+                    for(int z = 0; z < this.schematic.getLength(); z += 1) {
                         BlockPos pos = new BlockPos(x, this.layer, z);
                         BlockPos offsettedPos = pos.add(this.offset).add(this.pos);
                         IBlockState wantedState = this.schematic.getBlockState(pos);
@@ -212,32 +215,81 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                         if(!wantedState.getBlock().canPlaceBlockAt(this.world, offsettedPos))continue;
                         if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState))continue;
 
-                        this.pendingBlock = offsettedPos;
-                        this.expectedState = wantedState;
-                        Builders.LOG.warn("Set pending block to " + this.pendingBlock + "!");
-                        this.schematicTracker.getAndSetChanged(true);
-                        return;
+                        blocksNeeded.add(new Pair<>(offsettedPos, wantedState));
+                        placed = true;
                     }
                 }
             }
-        } else {
-            IBlockState wantedState = this.schematic.getBlockState(this.pendingBlock.subtract(this.offset).subtract(this.pos));
-            IBlockState actualState = this.world.getBlockState(this.pendingBlock);
+
+            if(placed) {
+                this.layer--;
+                blocksNeeded.removeIf(this.pendingBlocks::contains);
+
+                while(blocksNeeded.size() > 0 && this.pendingBlocks.size() < this.builderCount) {
+                    int i = 0;
+                            // this.world.rand.nextInt(blocksNeeded.size());
+                    this.pendingBlocks.add(blocksNeeded.get(i));
+                    blocksNeeded.remove(i);
+                }
+
+                this.pendingBlocks.forEach(pendingBlock -> {
+                    if(blocksNeeded.size() > 0 && pendingBlock.getKey() == null) {
+                        int i = 0;
+                        // this.world.rand.nextInt(blocksNeeded.size());
+                        pendingBlock.setKey(blocksNeeded.get(i).getKey());
+                        pendingBlock.setValue(blocksNeeded.get(i).getValue());
+                        blocksNeeded.remove(i);
+                    }
+                });
+
+                this.pendingBlocks = this.pendingBlocks.stream().limit(this.builderCount).collect(Collectors.toList());
+            }
+
+            if(startLayer != this.layer) {
+                this.schematicTracker.getAndSetChanged(true);
+            }
+
+            return;
+        }
+
+        /*
+        this.pendingBlocks.removeIf(pendingBlock -> {
+            BlockPos pendingPos = pendingBlock.getKey();
+            IBlockState wantedState = this.schematic.getBlockState(pendingPos.subtract(this.offset).subtract(this.pos));
+            IBlockState actualState = this.world.getBlockState(pendingPos);
 
             if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
-                this.pendingBlock = null;
-                Builders.LOG.warn("Set pending block to " + this.pendingBlock + "!");
-                this.updatePendingBlock();
+                return true;
             }
-        }
+
+            return false;
+        });*/
+
+        this.pendingBlocks.forEach(pendingBlock -> {
+            BlockPos pendingPos = pendingBlock.getKey();
+
+            if(pendingPos != null) {
+                IBlockState wantedState = this.schematic.getBlockState(pendingPos.subtract(this.offset).subtract(this.pos));
+                IBlockState actualState = this.world.getBlockState(pendingPos);
+
+                if (wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
+                    pendingBlock.setKey(null);
+                }
+            }
+        });
     }
 
-    private void updateBuilderEntity() {
-        if(!this.world.isRemote && (this.builder == null || this.builder.isDead)) {
-            this.builder = new EntityBuilder(this.world);
-            this.builder.setPosition(this.pos.getX() + 0.5f, this.pos.getY() + 1.0f, this.pos.getZ() + 0.5f);
-            this.builder.setCreator(this);
-            this.world.spawnEntity(this.builder);
+    private void updateBuilders() {
+        if(this.world.isRemote)return;
+
+        this.builders.removeIf(builder -> builder.isDead);
+
+        while(this.builders.size() < this.builderCount) {
+            EntityBuilder builder = new EntityBuilder(this.world);
+            builder.setPosition(this.pos.getX() + 0.5f, this.pos.getY() + 1.0f, this.pos.getZ() + 0.5f);
+            builder.setCreator(this);
+            this.world.spawnEntity(builder);
+            this.builders.add(builder);
         }
     }
 
@@ -248,15 +300,31 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     }
 
     public BlockPos getOffset() {
-        return this.offset;
+        if(this.pendingBlocks.isEmpty()) {
+            return this.offset;
+        }
+
+        return this.offset.offset(EnumFacing.UP, this.layer);
     }
 
-    public BlockPos getPendingBlock() {
-        return this.pendingBlock;
+    public BlockPos getPendingBlock(EntityBuilder builder) {
+        int i = this.builders.indexOf(builder);
+
+        if(i < 0 || i >= this.pendingBlocks.size()) {
+            return null;
+        }
+
+        return this.pendingBlocks.get(i).getKey();
     }
 
-    public IBlockState getExpectedState() {
-        return this.expectedState;
+    public IBlockState getExpectedState(EntityBuilder builder) {
+        int i = this.builders.indexOf(builder);
+
+        if(i < 0 || i >= this.pendingBlocks.size()) {
+            return null;
+        }
+
+        return this.pendingBlocks.get(i).getValue();
     }
 
 }
