@@ -39,7 +39,17 @@ public class MegaSchematic implements ISchematic {
     }
 
     public void addSchematic(ISchematic schematic, BlockPos pos) {
-        this.schematics.add(new SchematicWrapper(schematic, pos));
+        SchematicWrapper schematicWrapper = new SchematicWrapper(schematic, pos);
+        this.schematics.add(schematicWrapper);
+
+        Minecraft.getMinecraft().world.markBlockRangeForRenderUpdate(
+                schematicWrapper.pos.x,
+                schematicWrapper.pos.y,
+                schematicWrapper.pos.z,
+                schematicWrapper.pos.x + schematicWrapper.schematic.getWidth(),
+                schematicWrapper.pos.y + schematicWrapper.schematic.getHeight(),
+                schematicWrapper.pos.z + schematicWrapper.schematic.getLength()
+        );
     }
 
     public static class SchematicWrapper {
