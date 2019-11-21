@@ -67,8 +67,13 @@ public class BlockCreator extends Block implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if(hand == EnumHand.MAIN_HAND && !player.isSneaking() && player.getHeldItem(hand).getItem() != InitItem.SCHEMATIC_RELOCATOR) {
-            player.openGui(Builders.getInstance(), GuiHandler.CREATOR, world, pos.getX(), pos.getY(), pos.getZ());
+        if(hand == EnumHand.MAIN_HAND && player.getHeldItem(hand).getItem() != InitItem.SCHEMATIC_RELOCATOR) {
+            if(!player.isSneaking()) {
+                player.openGui(Builders.getInstance(), GuiHandler.CREATOR, world, pos.getX(), pos.getY(), pos.getZ());
+            } else {
+                player.openGui(Builders.getInstance(), GuiHandler.CREATOR_WORKERS, world, pos.getX(), pos.getY(), pos.getZ());
+            }
+
             return true;
         }
 

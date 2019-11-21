@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class TileEntityCreator extends TileEntity implements ITickable {
 
-    protected ItemStackHandler inventory = new ItemStackHandler(3) {
+    protected ItemStackHandler inventory = new ItemStackHandler(3 + 54) {
         @Nonnull
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
@@ -51,7 +51,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 return stack.getItem() == InitItem.BLUEPRINT;
             }
 
-            return false;
+            return stack.getItem() == iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER;
         }
     };
 
@@ -151,6 +151,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         this.inventory.deserializeNBT(compound.getCompoundTag("Inventory"));
+
         this.offset = compound.hasKey("Offset", Constants.NBT.TAG_LONG) ?
                 BlockPos.fromLong(compound.getLong("Offset")) :
                 BlockPos.ORIGIN.add(1, 1, 1);
@@ -300,12 +301,32 @@ public class TileEntityCreator extends TileEntity implements ITickable {
         this.builders.removeIf(builder -> builder.isDead);
 
         while(this.builders.size() < this.builderCount) {
+            ItemStack subStack = this.getAndRemoveSub();
+            if(subStack.isEmpty())break;
+
             EntityBuilder builder = new EntityBuilder(this.world);
             builder.setPosition(this.pos.getX() + 0.5f, this.pos.getY() + 1.0f, this.pos.getZ() + 0.5f);
             builder.setCreator(this);
+
+            int months = iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER.getMonths(subStack);
+            months = Math.max(months, 1);
+            builder.setBlocksLeft(months * 20 + 10);
+
             this.world.spawnEntity(builder);
             this.builders.add(builder);
         }
+    }
+
+    public ItemStack getAndRemoveSub() {
+        for(int i = 3; i < this.inventory.getSlots(); i++) {
+            ItemStack stack = this.inventory.getStackInSlot(i).copy();
+            if(stack.isEmpty())continue;
+            if(stack.getItem() != iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER)continue;
+            this.inventory.setStackInSlot(i, ItemStack.EMPTY);
+            return stack;
+        }
+
+        return ItemStack.EMPTY;
     }
 
     public boolean isAirOrLiquid(IBlockState state) {
