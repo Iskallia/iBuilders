@@ -12,17 +12,16 @@ public abstract class PathFinder {
 
     protected World world;
     protected List<Agent<?>> agents;
+    private final Type type;
 
-    protected BlockPos start;
-    protected BlockPos end;
-
-    protected Set<Node> openNodes = new ConcurrentSet<>();
-    protected Set<Node> closedNodes = new ConcurrentSet<Node>();
+    protected Set<Node> openNodes = new HashSet<>();
+    protected Set<Node> closedNodes = new HashSet<>();
     protected Queue<Node> finalPath = new ConcurrentLinkedQueue<>();
 
-    public PathFinder(World world, List<Agent<?>> agents) {
+    public PathFinder(World world, List<Agent<?>> agents, Type type) {
         this.world = world;
         this.agents = agents;
+        this.type = type;
     }
 
     public abstract void update();
@@ -67,7 +66,7 @@ public abstract class PathFinder {
             for(Agent<?> agent: this.agents) {
                 for(Node child: agent.getNodes(this.world, currentNode)) {
                     child.parent = currentNode;
-                    child.heuristic = (float)Math.sqrt(endNode.getPos().distanceSq(child.getPos()));
+                    child.heuristic = (float)endNode.getPos().distanceSq(child.getPos());
                     child.totalCost = child.pathCost + child.heuristic;
                     child.agent = agent;
 
@@ -77,7 +76,7 @@ public abstract class PathFinder {
 
                     if(!this.openNodes.contains(child)) {
                         this.openNodes.add(child);
-                    } else if((existingNode = getNodeWithPos(this.openNodes, child.getPos())) != null && child.pathCost < existingNode.pathCost) {
+                    } else if((existingNode = getNodeWithPos(this.openNodes, child.getPos())) != null && child.totalCost < existingNode.totalCost) {
                         this.openNodes.remove(existingNode);
                         this.openNodes.add(child);
                     }
@@ -95,6 +94,10 @@ public abstract class PathFinder {
         }
 
         return null;
+    }
+
+    public enum Type {
+        A_STAR, GREEDY
     }
 
 }
