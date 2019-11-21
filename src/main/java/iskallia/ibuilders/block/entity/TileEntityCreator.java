@@ -71,7 +71,9 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     }
 
     public BuildersSchematic getSchematic() {
-        if(this.pendingBlocks.isEmpty()) {
+        int pendingBlocksCount = (int)this.pendingBlocks.stream().filter(pendingBlock -> pendingBlock.getKey() != null).count();
+
+        if(pendingBlocksCount == 0) {
             return this.schematic;
         }
 
@@ -232,15 +234,29 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                     blocksNeeded.remove(i);
                 }
 
-                this.pendingBlocks.forEach(pendingBlock -> {
+                for(int i = 0; i < this.pendingBlocks.size() && i < this.builders.size(); i++) {
+                    Pair<BlockPos, IBlockState> pendingBlock = this.pendingBlocks.get(i);
+
                     if(blocksNeeded.size() > 0 && pendingBlock.getKey() == null) {
-                        int i = 0;
-                        // this.world.rand.nextInt(blocksNeeded.size());
-                        pendingBlock.setKey(blocksNeeded.get(i).getKey());
-                        pendingBlock.setValue(blocksNeeded.get(i).getValue());
-                        blocksNeeded.remove(i);
+                        EntityBuilder builder = this.builders.get(i);
+
+                        Pair<BlockPos, IBlockState> blockNeeded = null;
+                        int index = -1;
+
+                        for (int j = 0; j < blocksNeeded.size(); j++) {
+                            Pair<BlockPos, IBlockState> c = blocksNeeded.get(j);
+
+                            if(blockNeeded == null || c.getKey().distanceSq(builder.getPosition()) < blockNeeded.getKey().distanceSq(builder.getPosition())) {
+                                blockNeeded = c;
+                                index = j;
+                            }
+                        }
+
+                        pendingBlock.setKey(blockNeeded.getKey());
+                        pendingBlock.setValue(blockNeeded.getValue());
+                        blocksNeeded.remove(index);
                     }
-                });
+                }
 
                 this.pendingBlocks = this.pendingBlocks.stream().limit(this.builderCount).collect(Collectors.toList());
             }
@@ -249,7 +265,6 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 this.schematicTracker.getAndSetChanged(true);
             }
 
-            return;
         }
 
         /*
@@ -300,7 +315,9 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     }
 
     public BlockPos getOffset() {
-        if(this.pendingBlocks.isEmpty()) {
+        int pendingBlocksCount = (int)this.pendingBlocks.stream().filter(pendingBlock -> pendingBlock.getKey() != null).count();
+
+        if(pendingBlocksCount == 0) {
             return this.offset;
         }
 
