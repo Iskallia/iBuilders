@@ -1,6 +1,7 @@
 package iskallia.ibuilders.entity;
 
 import iskallia.ibuilders.block.entity.TileEntityCreator;
+import iskallia.ibuilders.util.MaterialList;
 import iskallia.itraders.util.profile.SkinProfile;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -88,7 +89,7 @@ public class EntityBuilder extends EntityCreature {
         if(pos == null)return;
 
         if(this.getBuildState() != null) {
-            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Item.getItemFromBlock(this.getBuildState().getBlock())));
+            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget()));
         }
 
         if(pos.distanceSq(this.getPosition()) > 3 * 3)return;
