@@ -2,7 +2,6 @@ package iskallia.ibuilders.block;
 
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.entity.TileEntityCreator;
-import iskallia.ibuilders.block.entity.TileEntitySchematicTerminal;
 import iskallia.ibuilders.gui.GuiHandler;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
@@ -22,7 +21,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
-public class BlockCreator extends Block implements ITileEntityProvider {
+public class BlockCreator extends BlockFacing implements ITileEntityProvider {
 
     public BlockCreator(String name) {
         super(Material.IRON);
@@ -48,7 +47,7 @@ public class BlockCreator extends Block implements ITileEntityProvider {
     public void breakBlock(World world, BlockPos pos, IBlockState state)  {
         TileEntity tileentity = world.getTileEntity(pos);
 
-        if(tileentity instanceof TileEntitySchematicTerminal) {
+        if(tileentity instanceof TileEntityCreator) {
             IItemHandler inventory = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH);
 
             if(inventory != null) {
