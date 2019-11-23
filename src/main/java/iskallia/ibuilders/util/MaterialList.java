@@ -20,7 +20,7 @@ public class MaterialList {
         for(Behaviour override: OVERRIDES) {
             if(override.matches(state)) {
                 ItemStack stack = override.getItem(world, state, pos);
-                Builders.LOG.error(stack);
+                //Builders.LOG.error(stack);
                 if(!stack.isEmpty())return stack;
             }
         }
