@@ -115,9 +115,9 @@ public class ItemBlueprint extends Item {
                     stackNbt.removeTag("SecondCorner");
                     heldStack.setTagCompound(stackNbt);
                     changed = true;
-                } else if(Math.abs(firstCorner.getX() - pos.getX()) > 16
+                } else if(Math.abs(firstCorner.getX() - pos.getX()) > 64
                     || Math.abs(firstCorner.getY() - pos.getY()) > 256
-                    || Math.abs(firstCorner.getZ() - pos.getZ()) > 16) {
+                    || Math.abs(firstCorner.getZ() - pos.getZ()) > 64) {
                     player.sendStatusMessage(new TextComponentTranslation("use.blueprint.corner.far"), true);
                 } else {
                     heldStack.setTagInfo("SecondCorner", new NBTTagLong(pos.toLong()));
