@@ -98,6 +98,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
     public void setSchematic(BuildersSchematic schematic) {
         this.rawSchematic = schematic;
+        this.schematic = schematic;
 
         if(this.schematicTracker == null) {
             this.schematicTracker = SchematicTracker.get(this.getWorld());
