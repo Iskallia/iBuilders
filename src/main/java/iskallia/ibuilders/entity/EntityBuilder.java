@@ -1,10 +1,12 @@
 package iskallia.ibuilders.entity;
 
 import com.mojang.authlib.GameProfile;
+import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.util.MaterialList;
 import iskallia.itraders.entity.FakeUser;
 import iskallia.itraders.util.profile.SkinProfile;
+import net.minecraft.block.BlockDoor;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -73,9 +75,19 @@ public class EntityBuilder extends EntityCreature {
             if(this.isDead)return;
             this.pathFinder.update();
             this.placeBlocks();
+
+            if(this.getBuildTarget() != null && this.getBuildState() != null) {
+                ItemStack stack = MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget());
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack.copy());
+                this.fakeUser.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack.copy());
+            } else {
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, ItemStack.EMPTY);
+                this.fakeUser.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, ItemStack.EMPTY);
+            }
         }
 
         this.updateArmSwingProgress();
+
     }
 
     private void placeBlocks() {
@@ -96,33 +108,30 @@ public class EntityBuilder extends EntityCreature {
         BlockPos pos = this.getBuildTarget();
         if(pos == null)return;
 
-        if(this.getBuildState() != null) {
-            ItemStack stack = MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget());
-            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack.copy());
-            this.fakeUser.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack.copy());
-        }
-
         if(pos.distanceSq(this.getPosition()) > 3 * 3)return;
 
         IBlockState state = this.world.getBlockState(pos);
 
         if(this.isAirOrLiquid(state) && this.getBuildState() != null) {
-            for(EnumFacing facing: EnumFacing.values()) {
-                this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND).onItemUse(this.fakeUser, this.world, pos, EnumHand.MAIN_HAND, facing, 0, 0, 0);
-            }
+            ItemStack extractedStack = this.creator.getBuildingStack(MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget()), false);
 
-            this.creator.getBuildingStack(MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget()), false);
+            if(!extractedStack.isEmpty()) {
+                //TODO: Not hardcoding this...
+                if(this.getBuildState().getBlock() instanceof BlockDoor) {
+                    this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND).onItemUse(this.fakeUser, this.world, pos, EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
+                }
 
-            this.world.setBlockState(pos, this.getBuildState());
-            this.getBuildState().getBlock().onBlockAdded(this.world, pos, this.getBuildState());
-            SoundType type = this.getBuildState().getBlock().getSoundType(state, this.world, pos, this);
-            this.world.playSound(null, pos, type.getPlaceSound(), SoundCategory.BLOCKS, type.getVolume(), type.getPitch());
-            this.swingArm(EnumHand.MAIN_HAND);
-            this.pathFinder.reset();
-            this.placeBlockDelay = 5;
+                this.world.setBlockState(pos, this.getBuildState());
+                this.getBuildState().getBlock().onBlockAdded(this.world, pos, this.getBuildState());
+                SoundType type = this.getBuildState().getBlock().getSoundType(state, this.world, pos, this);
+                this.world.playSound(null, pos, type.getPlaceSound(), SoundCategory.BLOCKS, type.getVolume(), type.getPitch());
+                this.swingArm(EnumHand.MAIN_HAND);
+                this.pathFinder.reset();
+                this.placeBlockDelay = 5;
 
-            if(--this.blocksLeft == 0) {
-                this.setDead();
+                if(--this.blocksLeft == 0) {
+                    this.setDead();
+                }
             }
         }
     }
@@ -133,7 +142,8 @@ public class EntityBuilder extends EntityCreature {
     }
 
     @Override
-    protected void dealFireDamage(int amount) {
+    public boolean isInLava() {
+        return false;
     }
 
     @Override
