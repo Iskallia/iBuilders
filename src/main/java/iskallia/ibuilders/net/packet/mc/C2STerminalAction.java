@@ -75,7 +75,8 @@ public class C2STerminalAction implements IMessage {
                     if(schematicNBT != null) {
                         BuildersSchematic schematic = BuildersFormat.INSTANCE.readFromNBT(schematicNBT);
 
-                        if(!dataSchematics.hasSchematic(playerUuid, schematic.getInfo().getName())) {
+                        if(schematic.getInfo().getUuid().equals(player.getUniqueID().toString())
+                                && !dataSchematics.hasSchematic(playerUuid, schematic.getInfo().getName())) {
                             dataSchematics.addSchematic(playerUuid, schematic);
                             blueprint.shrink(1);
                         }
