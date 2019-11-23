@@ -6,6 +6,7 @@ use.build_blueprint.fail.not_marker=§4Need to use on a Schema Marker!
 use.build_blueprint.fail.not_connected=§4This Marker is not connected yet!
 use.build_blueprint.success=§aSuccessfully exported shape to Blueprint!
 tooltip.build_blueprint.empty=§8No block shape saved yet.
+use.blueprint.corner.far=§3Too far away!
 
 # Markers
 tile.schema_marker.name=Schema Marker
