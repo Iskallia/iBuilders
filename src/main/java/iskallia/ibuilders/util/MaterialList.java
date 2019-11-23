@@ -1,6 +1,7 @@
 package iskallia.ibuilders.util;
 
 import iskallia.ibuilders.Builders;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +30,20 @@ public class MaterialList {
 
     public static void initializeOverrides() {
         OVERRIDES.clear();
+
+        OVERRIDES.add(new Behaviour() {
+            @Override
+            public boolean matches(IBlockState state) {
+                return state.getBlock() instanceof BlockSlab && ((BlockSlab)state.getBlock()).isDouble();
+            }
+
+            @Override
+            public ItemStack getItem(World world, IBlockState state, BlockPos pos) {
+                ItemStack stack = state.getBlock().getItem(world, pos, state);
+                stack.setCount(2);
+                return stack;
+            }
+        });
 
         OVERRIDES.add(new Behaviour() {
             @Override
