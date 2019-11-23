@@ -52,7 +52,7 @@ public class ItemSchematicRelocator extends Item {
                         player.sendStatusMessage(new TextComponentTranslation("use.schematic_relocator.move.far"), true);
                     } else {
                         player.sendStatusMessage(new TextComponentTranslation("use.schematic_relocator.move.successful"), true);
-                        creator.setTransform(pos.subtract(creatorPos), player.getHorizontalFacing());
+                        creator.setTransform(pos.subtract(creatorPos), player.getHorizontalFacing(), true);
                         return EnumActionResult.SUCCESS;
                     }
                 } else {
