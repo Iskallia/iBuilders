@@ -1,5 +1,6 @@
 package iskallia.ibuilders.util;
 
+import iskallia.ibuilders.Builders;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -13,22 +14,22 @@ public class MaterialList {
     public static final List<Behaviour> OVERRIDES = new ArrayList<>();
 
     public static ItemStack getItem(World world, IBlockState state, BlockPos pos) {
-        for(Behaviour override : OVERRIDES) {
+        initializeOverrides();
+
+        for(Behaviour override: OVERRIDES) {
             if(override.matches(state)) {
                 ItemStack stack = override.getItem(world, state, pos);
-                if (!stack.isEmpty())return stack;
+                Builders.LOG.error(stack);
+                if(!stack.isEmpty())return stack;
             }
         }
 
         return ItemStack.EMPTY;
     }
 
-    public static abstract class Behaviour {
-        public abstract boolean matches(IBlockState state);
-        public abstract ItemStack getItem(World world, IBlockState state, BlockPos pos);
-    }
+    public static void initializeOverrides() {
+        OVERRIDES.clear();
 
-    static {
         OVERRIDES.add(new Behaviour() {
             @Override
             public boolean matches(IBlockState state) {
@@ -57,6 +58,15 @@ public class MaterialList {
                 return state.getBlock().getItem(world, pos, state);
             }
         });
+    }
+
+    public static abstract class Behaviour {
+        public abstract boolean matches(IBlockState state);
+        public abstract ItemStack getItem(World world, IBlockState state, BlockPos pos);
+    }
+
+    static {
+        initializeOverrides();
     }
 
 }
