@@ -98,8 +98,8 @@ public class EntityBuilder extends EntityCreature {
 
         if(this.getBuildState() != null) {
             ItemStack stack = MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget());
-            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack);
-            this.fakeUser.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack);
+            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack.copy());
+            this.fakeUser.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack.copy());
         }
 
         if(pos.distanceSq(this.getPosition()) > 3 * 3)return;
@@ -110,6 +110,8 @@ public class EntityBuilder extends EntityCreature {
             for(EnumFacing facing: EnumFacing.values()) {
                 this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND).onItemUse(this.fakeUser, this.world, pos, EnumHand.MAIN_HAND, facing, 0, 0, 0);
             }
+
+            this.creator.getBuildingStack(MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget()), false);
 
             this.world.setBlockState(pos, this.getBuildState());
             this.getBuildState().getBlock().onBlockAdded(this.world, pos, this.getBuildState());

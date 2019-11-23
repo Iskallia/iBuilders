@@ -2,10 +2,13 @@ package iskallia.ibuilders.block.entity;
 
 import com.github.lunatrius.schematica.client.util.RotationHelper;
 import com.github.lunatrius.schematica.world.storage.Schematic;
+import iskallia.ibuilders.block.BlockFacing;
 import iskallia.ibuilders.entity.EntityBuilder;
+import iskallia.ibuilders.init.InitBlock;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
+import iskallia.ibuilders.util.MaterialList;
 import iskallia.ibuilders.util.Pair;
 import iskallia.ibuilders.world.data.SchematicTracker;
 import net.minecraft.block.material.Material;
@@ -20,6 +23,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -189,7 +194,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
         this.inventory.setStackInSlot(2, blueprint);
         this.lastBlueprint = blueprint;
-        this.builderCount = 3;
+        this.builderCount = 20;
 
         this.updatePendingBlock();
         this.updateBuilders();
@@ -227,6 +232,11 @@ public class TileEntityCreator extends TileEntity implements ITickable {
             if(placed) {
                 this.layer--;
                 blocksNeeded.removeIf(this.pendingBlocks::contains);
+
+                blocksNeeded.removeIf(pendingBlock -> {
+                    ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
+                    return this.getBuildingStack(material, true).isEmpty();
+                });
 
                 while(blocksNeeded.size() > 0 && this.pendingBlocks.size() < this.builderCount) {
                     int i = 0;
@@ -288,11 +298,50 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 IBlockState wantedState = this.schematic.getBlockState(pendingPos.subtract(this.offset).subtract(this.pos));
                 IBlockState actualState = this.world.getBlockState(pendingPos);
 
-                if (wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
+                if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
                     pendingBlock.setKey(null);
                 }
             }
+
+            ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
+
+            if(this.getBuildingStack(material, true).isEmpty()) {
+                pendingBlock.setKey(null);
+            }
         });
+    }
+
+    public ItemStack getBuildingStack(ItemStack wantedStack, boolean simulate) {
+        IBlockState state = this.world.getBlockState(this.pos);
+        if(state.getBlock() != InitBlock.CREATOR)return ItemStack.EMPTY;
+        EnumFacing facing = state.getValue(BlockFacing.FACING);
+
+        EnumFacing[] directions = new EnumFacing[] {
+                facing.getOpposite(),
+                facing.getOpposite().rotateYCCW(),
+                facing.getOpposite().rotateYCCW().getOpposite()
+        };
+
+        ItemStack completedStack = wantedStack.copy();
+        int neededCount = wantedStack.getCount();
+
+        for(EnumFacing direction: directions) {
+            TileEntity tileEntity = world.getTileEntity(this.pos.offset(direction));
+            if(tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
+                IItemHandler itemHandler = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
+
+                for(int i = 0; i < itemHandler.getSlots() && neededCount > 0; i++) {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    if(stackInSlot.isEmpty())continue;
+                    if(!ItemHandlerHelper.canItemStacksStackRelaxed(wantedStack, stackInSlot))continue;
+                    ItemStack extractedStack = itemHandler.extractItem(i, neededCount, simulate);
+                    neededCount -= extractedStack.getCount();
+                }
+            }
+        }
+
+        completedStack.shrink(neededCount);
+        return completedStack;
     }
 
     private void updateBuilders() {
