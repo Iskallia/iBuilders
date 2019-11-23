@@ -97,7 +97,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
         }
 
         this.setTransform(BlockPos.ORIGIN, EnumFacing.EAST);
-        this.schematicTracker.updateCreator(this);
+        this.schematicTracker.getAndSetChanged(true);
     }
 
     public void setTransform(BlockPos offset, EnumFacing axis) {

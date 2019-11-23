@@ -52,7 +52,7 @@ public class SchematicWorlds {
     @SubscribeEvent
     public static void onRenderWorldLast(RenderWorldLastEvent event) {
         get().renderSchematic.onRenderWorldLast(event);
-        ((MegaSchematic)get().schematicWorld.getSchematic()).renderOutlines();
+        ((MegaSchematic)get().schematicWorld.getSchematic()).renderOutlines(event.getPartialTicks());
     }
 
 }

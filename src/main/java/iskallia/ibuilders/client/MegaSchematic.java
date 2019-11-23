@@ -1,27 +1,20 @@
 package iskallia.ibuilders.client;
 
-import com.github.lunatrius.core.client.renderer.GeometryMasks;
-import com.github.lunatrius.core.client.renderer.GeometryTessellator;
 import com.github.lunatrius.schematica.api.ISchematic;
-import com.github.lunatrius.schematica.client.world.SchematicWorld;
-import com.github.lunatrius.schematica.handler.ConfigurationHandler;
 import com.github.lunatrius.schematica.proxy.ClientProxy;
+import com.sun.javafx.geom.Vec3f;
+import iskallia.ibuilders.util.RenderUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -65,39 +58,68 @@ public class MegaSchematic implements ISchematic {
         );
     }
 
-    public void renderOutlines() {
-        /*
+    public void renderOutlines(float partialTicks) {
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableAlpha();
+
         for(SchematicWrapper schematicWrapper: this.schematics) {
-            ISchematic schematic = schematicWrapper.schematic;
+            ISchematic s = schematicWrapper.schematic;
             BlockPos pos1 = schematicWrapper.getPosition();
-            BlockPos pos2 = pos1.add(schematic.getWidth(), schematic.getHeight(), schematic.getLength());
+            BlockPos pos2 = pos1.add(s.getWidth(), s.getHeight(), s.getLength());
 
-            Entity cam = Minecraft.getMinecraft().getRenderViewEntity();
-            Vec3d camPos = new Vec3d(cam.posX, cam.posY, cam.posZ);
+            Vec3d camPos = RenderUtils.getCameraView(partialTicks);
 
-            GlStateManager.glLineWidth(2.0f);
-            Tessellator.getInstance().getBuffer().begin(3, DefaultVertexFormats.POSITION_COLOR);
+            Vec3d color = new Vec3d(0.0f, 0.8f, 1.0f);
 
-            this.putVertex(camPos, pos1);
-            this.putVertex(camPos, pos2);
+            this.drawLine(camPos, pos1, pos1.add(s.getWidth(), 0, 0), color);
+            this.drawLine(camPos, pos1, pos1.add(0, s.getHeight(), 0), color);
+            this.drawLine(camPos, pos1, pos1.add(0, 0, s.getLength()), color);
 
-            Tessellator.getInstance().draw();
-        }*/
+            this.drawLine(camPos, pos2, pos2.add(-s.getWidth(), 0, 0), color);
+            this.drawLine(camPos, pos2, pos2.add(0, -s.getHeight(), 0), color);
+            this.drawLine(camPos, pos2, pos2.add(0, 0, -s.getLength()), color);
+
+            this.drawLine(camPos, pos1.add(0, s.getHeight(), 0), pos1.add(s.getWidth(), s.getHeight(), 0), color);
+            this.drawLine(camPos, pos1.add(0, s.getHeight(), 0), pos1.add(0, s.getHeight(), s.getLength()), color);
+
+            this.drawLine(camPos, pos2.add(0, -s.getHeight(), 0), pos2.add(-s.getWidth(), -s.getHeight(), 0), color);
+            this.drawLine(camPos, pos2.add(0, -s.getHeight(), 0), pos2.add(0, -s.getHeight(), -s.getLength()), color);
+
+            this.drawLine(camPos, pos1.add(s.getWidth(), 0, 0), pos1.add(s.getWidth(), s.getHeight(), 0), color);
+            this.drawLine(camPos, pos1.add(0, 0, s.getLength()), pos1.add(0, s.getHeight(), s.getLength()), color);
+        }
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
     }
 
-    protected void putVertex(Vec3d camPos, BlockPos pos) {
-        for(int i = 0; i < 2; i++) {
-            Tessellator.getInstance().getBuffer().pos(
-                    pos.getX() - camPos.x,
-                    pos.getY() - camPos.y,
-                    pos.getZ() - camPos.z
-            ).color(
-                    1.0f,
-                    1.0f,
-                    1.0f,
-                    1.0f
-            ).endVertex();
-        }
+    protected void drawLine(Vec3d camPos, BlockPos pos1, BlockPos pos2, Vec3d color) {
+        GlStateManager.glLineWidth(3.0f);
+        Tessellator.getInstance().getBuffer().begin(3, DefaultVertexFormats.POSITION_COLOR);
+
+        Tessellator.getInstance().getBuffer().pos(
+                pos1.getX() - camPos.x,
+                pos1.getY() - camPos.y,
+                pos1.getZ() - camPos.z
+        ).color(
+                (float)color.x,
+                (float)color.y,
+                (float)color.z,
+                1.0f
+        ).endVertex();
+
+        Tessellator.getInstance().getBuffer().pos(
+                pos2.getX() - camPos.x,
+                pos2.getY() - camPos.y,
+                pos2.getZ() - camPos.z
+        ).color(
+                (float)color.x,
+                (float)color.y,
+                (float)color.z,
+                1.0f
+        ).endVertex();
+
+        Tessellator.getInstance().draw();
     }
 
     public static class SchematicWrapper {
