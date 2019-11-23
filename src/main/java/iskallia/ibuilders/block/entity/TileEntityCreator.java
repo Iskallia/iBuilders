@@ -2,6 +2,7 @@ package iskallia.ibuilders.block.entity;
 
 import com.github.lunatrius.schematica.client.util.RotationHelper;
 import com.github.lunatrius.schematica.world.storage.Schematic;
+import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.block.BlockFacing;
 import iskallia.ibuilders.entity.EntityBuilder;
 import iskallia.ibuilders.init.InitBlock;
@@ -60,7 +61,8 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     };
 
     protected BuildersSchematic schematic = null;
-    private BlockPos offset;
+    private BlockPos offset = BlockPos.ORIGIN.add(1, 1, 1);
+    private EnumFacing axis = EnumFacing.EAST;
     private SchematicTracker schematicTracker;
     private ItemStack lastBlueprint;
     private BuildersSchematic rawSchematic;
@@ -69,6 +71,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     private List<EntityBuilder> builders = new ArrayList<>();
     private List<Pair<BlockPos, IBlockState>> pendingBlocks = new ArrayList<>();
     private int builderCount = 5;
+
 
     public TileEntityCreator() {
 
@@ -100,30 +103,33 @@ public class TileEntityCreator extends TileEntity implements ITickable {
             this.schematicTracker = SchematicTracker.get(this.getWorld());
         }
 
-        this.setTransform(BlockPos.ORIGIN, EnumFacing.EAST);
+        this.setTransform(this.offset, this.axis, false);
         this.schematicTracker.getAndSetChanged(true);
+        this.markDirty();
     }
 
-    public void setTransform(BlockPos offset, EnumFacing axis) {
+    public void setTransform(BlockPos offset, EnumFacing axis, boolean align) {
         if(this.rawSchematic == null)return;
-        this.offset = BlockPos.ORIGIN.add(1, 1, 1).add(offset);
+        this.offset = offset;
+        this.axis = axis;
 
         if(axis == EnumFacing.EAST) {
             this.schematic = this.rawSchematic;
         } else if(axis == EnumFacing.WEST) {
             this.schematic = this.rotateSchematic(this.rawSchematic, EnumFacing.DOWN);
             this.schematic = this.rotateSchematic(this.schematic, EnumFacing.DOWN);
-            this.offset = this.offset.add(-this.rawSchematic.getWidth() + 1,0,-this.rawSchematic.getLength() + 1);
+            if(align)this.offset = this.offset.add(-this.rawSchematic.getWidth() + 1,0,-this.rawSchematic.getLength() + 1);
         } else if(axis == EnumFacing.SOUTH) {
             this.schematic = this.rotateSchematic(this.rawSchematic, EnumFacing.UP);
-            this.offset = this.offset.add(-this.rawSchematic.getLength() + 1,0,0);
+            if(align)this.offset = this.offset.add(-this.rawSchematic.getLength() + 1,0,0);
         } else if(axis == EnumFacing.NORTH) {
             this.schematic = this.rotateSchematic(this.rawSchematic, EnumFacing.DOWN);
-            this.offset = this.offset.add(0,0, -this.rawSchematic.getWidth() + 1);
+            if(align)this.offset = this.offset.add(0,0, -this.rawSchematic.getWidth() + 1);
         }
 
         this.schematicTracker.getAndSetChanged(true);
         this.pendingBlocks.clear();
+        this.markDirty();
     }
 
     private BuildersSchematic rotateSchematic(BuildersSchematic schematic, EnumFacing axis) {
@@ -149,6 +155,10 @@ public class TileEntityCreator extends TileEntity implements ITickable {
             compound.setLong("Offset", this.offset.toLong());
         }
 
+        if(this.axis != null) {
+            compound.setInteger("Axis", this.axis.ordinal());
+        }
+
         return super.writeToNBT(compound);
     }
 
@@ -159,6 +169,11 @@ public class TileEntityCreator extends TileEntity implements ITickable {
         this.offset = compound.hasKey("Offset", Constants.NBT.TAG_LONG) ?
                 BlockPos.fromLong(compound.getLong("Offset")) :
                 BlockPos.ORIGIN.add(1, 1, 1);
+
+        this.axis = compound.hasKey("Axis", Constants.NBT.TAG_INT) ?
+                EnumFacing.values()[compound.getInteger("Axis")] :
+                EnumFacing.EAST;
+
         super.readFromNBT(compound);
     }
 
@@ -363,6 +378,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
             int months = iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER.getMonths(subStack);
             months = Math.max(months, 1);
             builder.setBlocksLeft(months * 20 + 10);
+            if(subStack.hasDisplayName())builder.setCustomNameTag(subStack.getDisplayName());
 
             this.world.spawnEntity(builder);
             this.builders.add(builder);
