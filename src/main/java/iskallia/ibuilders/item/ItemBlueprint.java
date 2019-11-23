@@ -1,18 +1,19 @@
 package iskallia.ibuilders.item;
 
 import iskallia.ibuilders.Builders;
-import iskallia.ibuilders.block.BlockMarker;
-import iskallia.ibuilders.block.entity.TileEntityMarker;
-import iskallia.ibuilders.init.InitBlock;
+import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.tab.CreativeTabsIBuilders;
-import net.minecraft.block.Block;
+import iskallia.ibuilders.util.Pair;
+import iskallia.ibuilders.world.data.SchematicTracker;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -20,10 +21,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import org.jline.utils.Log;
 import org.lwjgl.input.Keyboard;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -51,6 +50,7 @@ public class ItemBlueprint extends Item {
         this.setCreativeTab(CreativeTabsIBuilders.INSTANCE);
     }
 
+    /*
     @Nonnull
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -94,6 +94,85 @@ public class ItemBlueprint extends Item {
         player.sendStatusMessage(new TextComponentTranslation("use.build_blueprint.success"), true);
 
         return EnumActionResult.SUCCESS;
+    }*/
+
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack heldStack = player.getHeldItem(hand);
+        boolean changed = false;
+
+        if(hand == EnumHand.MAIN_HAND && heldStack.getItem() == InitItem.BLUEPRINT) {
+            NBTTagCompound stackNbt = heldStack.getTagCompound();
+
+            if(stackNbt == null || !stackNbt.hasKey("FirstCorner", Constants.NBT.TAG_LONG)) {
+                heldStack.setTagInfo("FirstCorner", new NBTTagLong(pos.toLong()));
+                changed = true;
+            } else {
+                BlockPos firstCorner = BlockPos.fromLong(stackNbt.getLong("FirstCorner"));
+
+                if(firstCorner.equals(pos)) {
+                    stackNbt.removeTag("FirstCorner");
+                    stackNbt.removeTag("SecondCorner");
+                    heldStack.setTagCompound(stackNbt);
+                    changed = true;
+                } else if(Math.abs(firstCorner.getX() - pos.getX()) > 16
+                    || Math.abs(firstCorner.getY() - pos.getY()) > 256
+                    || Math.abs(firstCorner.getZ() - pos.getZ()) > 16) {
+                    player.sendStatusMessage(new TextComponentTranslation("use.blueprint.corner.far"), true);
+                } else {
+                    heldStack.setTagInfo("SecondCorner", new NBTTagLong(pos.toLong()));
+                    Pair<BlockPos, BlockPos> posData = getCenterAndDimensions(firstCorner, pos);
+
+                    BuildersSchematic schematic = getSchematic(world, posData.getKey(), posData.getValue());
+
+                    schematic.getInfo().setUuid(player.getUniqueID().toString());
+                    schematic.setAuthor(player.getName());
+                    schematic.getInfo().setName(heldStack.hasDisplayName() ? heldStack.getDisplayName() : "My Build");
+                    schematic.getInfo().setDescription("This is my cool build!");
+
+                    setSchematicNBT(heldStack, schematic);
+                    changed = true;
+                }
+            }
+        }
+
+        if(changed)SchematicTracker.get(world).getAndSetChanged(true);
+        return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
+    }
+
+    public static Pair<BlockPos, BlockPos> getCenterAndDimensions(BlockPos firstCorner, BlockPos secondCorner) {
+        int x1 = firstCorner.getX() + (secondCorner.getX() > firstCorner.getX() ? 0 : 1);
+        int y1 = firstCorner.getY() + (secondCorner.getY() > firstCorner.getY() ? 0 : 1);
+        int z1 = firstCorner.getZ() + (secondCorner.getZ() > firstCorner.getZ() ? 0 : 1);
+        int x2 = secondCorner.getX() + (secondCorner.getX() > firstCorner.getX() ? 1 : 0);
+        int y2 = secondCorner.getY() + (secondCorner.getY() > firstCorner.getY() ? 1 : 0);
+        int z2 = secondCorner.getZ() + (secondCorner.getZ() > firstCorner.getZ() ? 1 : 0);
+
+        BlockPos center = new BlockPos(Math.min(x1, x2), Math.min(y1, y2), Math.min(z1, z2));
+        BlockPos dimensions = new BlockPos(Math.abs(x1 - x2), Math.abs(y1 - y2), Math.abs(z1 - z2));
+
+        if(!firstCorner.equals(secondCorner)) {
+            center = center.add(1, 1, 1);
+            dimensions = dimensions.add(-2, -2, -2);
+        }
+
+        return new Pair<>(center, dimensions);
+    }
+
+    public static BuildersSchematic getSchematic(World world, BlockPos pos, BlockPos dimensions) {
+        BuildersSchematic schematic = new BuildersSchematic(dimensions.getX(), dimensions.getY(), dimensions.getZ());
+
+        for(int x = 0; x < dimensions.getX(); x++) {
+            for(int y = 0; y <= dimensions.getY(); y++) {
+                for(int z = 0; z < dimensions.getZ(); z++) {
+                    BlockPos blockPos = new BlockPos(x, y, z);
+                    IBlockState blockState = world.getBlockState(blockPos.add(pos));
+                    schematic.setBlockState(blockPos, blockState);
+                }
+            }
+        }
+
+        return schematic;
     }
 
     @Override

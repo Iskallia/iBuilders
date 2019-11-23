@@ -1,8 +1,13 @@
 package iskallia.ibuilders.world.data;
 
+import com.github.lunatrius.schematica.api.ISchematic;
 import iskallia.ibuilders.block.entity.TileEntityCreator;
+import iskallia.ibuilders.init.InitItem;
+import iskallia.ibuilders.item.ItemBlueprint;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
+import iskallia.ibuilders.util.Pair;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
@@ -43,6 +48,25 @@ public class SchematicTracker extends WorldSavedData {
                 if(creator.getSchematic() != null) {
                     schematicMap.put(creator.getPos().add(creator.getOffset()), creator.getSchematic());
                 }
+            }
+        });
+
+        world.playerEntities.forEach(entityPlayer -> {
+            ItemStack heldStack = entityPlayer.getHeldItemMainhand();
+            NBTTagCompound stackNbt = heldStack.getTagCompound();
+
+            if(heldStack.getItem() == InitItem.BLUEPRINT && stackNbt != null
+                    && stackNbt.hasKey("FirstCorner", Constants.NBT.TAG_LONG)) {
+                BlockPos firstCorner = BlockPos.fromLong(stackNbt.getLong("FirstCorner"));
+
+                Pair<BlockPos, BlockPos> posData = ItemBlueprint.getCenterAndDimensions(firstCorner, firstCorner);
+
+                if(stackNbt.hasKey("SecondCorner", Constants.NBT.TAG_LONG)) {
+                    BlockPos secondCorner = BlockPos.fromLong(stackNbt.getLong("SecondCorner"));
+                    posData = ItemBlueprint.getCenterAndDimensions(firstCorner, secondCorner);
+                }
+
+                schematicMap.put(posData.getKey(), new BuildersSchematic(posData.getValue().x, posData.getValue().y, posData.getValue().z));
             }
         });
 
