@@ -24,7 +24,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -222,6 +221,8 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                         if(!this.isAirOrLiquid(actualState))continue;
                         if(!wantedState.getBlock().canPlaceBlockAt(this.world, offsettedPos))continue;
                         if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState))continue;
+                        ItemStack material = MaterialList.getItem(this.world, wantedState, offsettedPos);
+                        if(this.getBuildingStack(material, true).isEmpty())continue;
 
                         blocksNeeded.add(new Pair<>(offsettedPos, wantedState));
                         placed = true;
@@ -233,14 +234,8 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 this.layer--;
                 blocksNeeded.removeIf(this.pendingBlocks::contains);
 
-                blocksNeeded.removeIf(pendingBlock -> {
-                    ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
-                    return this.getBuildingStack(material, true).isEmpty();
-                });
-
                 while(blocksNeeded.size() > 0 && this.pendingBlocks.size() < this.builderCount) {
                     int i = 0;
-                            // this.world.rand.nextInt(blocksNeeded.size());
                     this.pendingBlocks.add(blocksNeeded.get(i));
                     blocksNeeded.remove(i);
                 }
@@ -278,19 +273,6 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
         }
 
-        /*
-        this.pendingBlocks.removeIf(pendingBlock -> {
-            BlockPos pendingPos = pendingBlock.getKey();
-            IBlockState wantedState = this.schematic.getBlockState(pendingPos.subtract(this.offset).subtract(this.pos));
-            IBlockState actualState = this.world.getBlockState(pendingPos);
-
-            if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
-                return true;
-            }
-
-            return false;
-        });*/
-
         this.pendingBlocks.forEach(pendingBlock -> {
             BlockPos pendingPos = pendingBlock.getKey();
 
@@ -303,10 +285,12 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 }
             }
 
-            ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
+            if(pendingBlock.getKey() != null) {
+                ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
 
-            if(this.getBuildingStack(material, true).isEmpty()) {
-                pendingBlock.setKey(null);
+                if (this.getBuildingStack(material, true).isEmpty()) {
+                    pendingBlock.setKey(null);
+                }
             }
         });
     }
@@ -333,7 +317,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 for(int i = 0; i < itemHandler.getSlots() && neededCount > 0; i++) {
                     ItemStack stackInSlot = itemHandler.getStackInSlot(i);
                     if(stackInSlot.isEmpty())continue;
-                    if(!ItemHandlerHelper.canItemStacksStackRelaxed(wantedStack, stackInSlot))continue;
+                    if(!canItemStacksStackRelaxed(wantedStack, stackInSlot))continue;
                     ItemStack extractedStack = itemHandler.extractItem(i, neededCount, simulate);
                     neededCount -= extractedStack.getCount();
                 }
@@ -342,6 +326,25 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
         completedStack.shrink(neededCount);
         return completedStack;
+    }
+
+    public static boolean canItemStacksStackRelaxed(@Nonnull ItemStack a, @Nonnull ItemStack b)  {
+        if (a.isEmpty() || b.isEmpty() || a.getItem() != b.getItem())
+            return false;
+
+        //if (!a.isStackable())
+        //    return false;
+
+        // Metadata value only matters when the item has subtypes
+        // Vanilla stacks non-subtype items with different metadata together
+        // e.g. a stick with metadata 0 and a stick with metadata 1 stack
+        if (a.getHasSubtypes() && a.getMetadata() != b.getMetadata())
+            return false;
+
+        if (a.hasTagCompound() != b.hasTagCompound())
+            return false;
+
+        return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound())) && a.areCapsCompatible(b);
     }
 
     private void updateBuilders() {
