@@ -1,5 +1,6 @@
 package iskallia.ibuilders.world.data;
 
+import com.github.lunatrius.schematica.api.ISchematic;
 import com.google.common.collect.Lists;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.schematic.BuildersFormat;
@@ -20,7 +21,7 @@ public class DataSchematics extends WorldSavedData {
 
     protected static final String DATA_NAME = "ibuilders_Schematics";
 
-    protected Map<String, List<BuildersSchematic>> schematicsMap = new HashMap<>();
+    public final Map<String, List<BuildersSchematic>> schematicsMap = new HashMap<>();
 
     public DataSchematics() {
         this(DATA_NAME);
@@ -54,6 +55,7 @@ public class DataSchematics extends WorldSavedData {
     @Nullable
     public BuildersSchematic getSchematic(String playerUuid, String name) {
         if(!this.schematicsMap.containsKey(playerUuid))return null;
+
         List<BuildersSchematic> schematics = this.schematicsMap.get(playerUuid);
 
         if(schematics == null || schematics.isEmpty()) {
@@ -85,6 +87,8 @@ public class DataSchematics extends WorldSavedData {
     }
 
     public void addSchematic(String playerUuid, BuildersSchematic schematic) {
+        if(schematic == null)return;
+
         if(!this.schematicsMap.containsKey(playerUuid)) {
             this.schematicsMap.put(playerUuid, Lists.newArrayList());
         }
@@ -105,7 +109,8 @@ public class DataSchematics extends WorldSavedData {
 
             playerSchematics.forEach(rawPlayerSchematic -> {
                 NBTTagCompound playerSchematic = (NBTTagCompound)rawPlayerSchematic;
-                schematics.add(BuildersFormat.INSTANCE.readFromNBT(playerSchematic));
+                BuildersSchematic schematic = BuildersFormat.INSTANCE.readFromNBT(playerSchematic);
+                if(schematic != null)schematics.add(schematic);
             });
 
             this.schematicsMap.put(playerUuid, schematics);
