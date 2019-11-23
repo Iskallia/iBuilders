@@ -3,7 +3,6 @@ package iskallia.ibuilders.net.packet.mc;
 import io.netty.buffer.ByteBuf;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.container.ContainerCreator;
-import iskallia.ibuilders.container.ContainerSchematicTerminal;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.item.ItemBlueprint;
 import iskallia.ibuilders.net.packet.PacketRequestSchemaInfo;
@@ -18,7 +17,6 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.items.ItemStackHandler;
 
 public class C2SCreatorAction implements IMessage {
 

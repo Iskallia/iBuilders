@@ -2,9 +2,7 @@ package iskallia.ibuilders.net.connection;
 
 import iskallia.ibuilders.net.context.Context;
 import iskallia.ibuilders.net.packet.Packet;
-import org.jline.utils.Log;
 
-import javax.management.AttributeList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.*;

@@ -1,7 +1,6 @@
 package iskallia.ibuilders.net.packet.mc;
 
 import io.netty.buffer.ByteBuf;
-import iskallia.ibuilders.gui.container.GuiContainerCreator;
 import iskallia.ibuilders.gui.container.GuiContainerSchemaInfo;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.client.Minecraft;

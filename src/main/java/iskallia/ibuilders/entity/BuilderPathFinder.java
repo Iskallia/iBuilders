@@ -1,14 +1,9 @@
 package iskallia.ibuilders.entity;
 
-import iskallia.ibuilders.Builders;
+import iskallia.ibuilders.entity.path.Agent;
 import iskallia.ibuilders.entity.path.Node;
 import iskallia.ibuilders.entity.path.PathFinder;
-import iskallia.ibuilders.entity.path.Agent;
-import iskallia.ibuilders.init.InitPath;
-import net.minecraft.entity.ai.EntityLookHelper;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;

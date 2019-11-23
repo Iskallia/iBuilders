@@ -4,7 +4,6 @@ import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.container.ContainerCreator;
 import iskallia.ibuilders.init.InitPacket;
 import iskallia.ibuilders.net.packet.mc.C2SCreatorAction;
-import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;

@@ -2,7 +2,6 @@ package iskallia.ibuilders.client;
 
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.proxy.ClientProxy;
-import com.sun.javafx.geom.Vec3f;
 import iskallia.ibuilders.util.RenderUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;

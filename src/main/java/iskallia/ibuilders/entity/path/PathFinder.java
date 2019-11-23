@@ -1,6 +1,5 @@
 package iskallia.ibuilders.entity.path;
 
-import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;

@@ -1,8 +1,6 @@
 package iskallia.ibuilders.world.data;
 
-import com.github.lunatrius.schematica.api.ISchematic;
 import com.google.common.collect.Lists;
-import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.nbt.NBTTagCompound;

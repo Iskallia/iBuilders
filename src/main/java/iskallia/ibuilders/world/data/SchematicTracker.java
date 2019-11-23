@@ -1,25 +1,19 @@
 package iskallia.ibuilders.world.data;
 
-import com.github.lunatrius.schematica.api.ISchematic;
 import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.item.ItemBlueprint;
-import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.util.Pair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class SchematicTracker extends WorldSavedData {
 

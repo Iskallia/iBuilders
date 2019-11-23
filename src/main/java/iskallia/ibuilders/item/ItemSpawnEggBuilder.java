@@ -2,7 +2,6 @@ package iskallia.ibuilders.item;
 
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.entity.EntityBuilder;
-import iskallia.ibuilders.tab.CreativeTabsIBuilders;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;

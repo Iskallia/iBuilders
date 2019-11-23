@@ -1,6 +1,5 @@
 package iskallia.ibuilders.net.packet;
 
-import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.container.ContainerCreator;
 import iskallia.ibuilders.init.InitItem;
 import iskallia.ibuilders.item.ItemBlueprint;

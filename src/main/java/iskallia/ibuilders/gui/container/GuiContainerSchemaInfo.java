@@ -1,7 +1,5 @@
 package iskallia.ibuilders.gui.container;
 
-import iskallia.ibuilders.init.InitPacket;
-import iskallia.ibuilders.net.packet.mc.C2STerminalAction;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;

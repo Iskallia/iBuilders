@@ -4,7 +4,6 @@ import iskallia.ibuilders.block.entity.TileEntityCreator;
 import iskallia.ibuilders.container.ContainerCreatorWorkers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
