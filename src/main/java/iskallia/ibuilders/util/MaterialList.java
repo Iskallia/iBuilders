@@ -9,6 +9,10 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,11 +61,10 @@ public class MaterialList {
 
             @Override
             public ItemStack getItem(World world, IBlockState state, BlockPos pos) {
-                //TODO: Not hardcoding this...
-                if(state.getMaterial() == Material.WATER) {
-                    return new ItemStack(Items.WATER_BUCKET, 1);
-                } else if(state.getMaterial() == Material.LAVA) {
-                    return new ItemStack(Items.LAVA_BUCKET, 1);
+                Fluid fluid = FluidRegistry.lookupFluidForBlock(state.getBlock());
+
+                if(fluid != null) {
+                    return FluidUtil.getFilledBucket(new FluidStack(fluid, 0));
                 }
 
                 return ItemStack.EMPTY;
