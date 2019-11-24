@@ -113,9 +113,9 @@ public class EntityBuilder extends EntityCreature {
         IBlockState state = this.world.getBlockState(pos);
 
         if(this.isAirOrLiquid(state) && this.getBuildState() != null) {
-            ItemStack extractedStack = this.creator.getBuildingStack(MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget()), false);
+            ItemStack buildStack = MaterialList.getItem(this.world, this.getBuildState(), this.getBuildTarget());
 
-            if(!extractedStack.isEmpty()) {
+            if(!buildStack.isEmpty() && !this.creator.getBuildingStack(buildStack, false).isEmpty()) {
                 //TODO: Not hardcoding this...
                 if(this.getBuildState().getBlock() instanceof BlockDoor) {
                     this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND).onItemUse(this.fakeUser, this.world, pos, EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
@@ -151,38 +151,23 @@ public class EntityBuilder extends EntityCreature {
         return false;
     }
 
-    public boolean isAirOrLiquid(IBlockState state) {
-        return state.getMaterial() == Material.AIR
-                || state.getMaterial() == Material.WATER
-                || state.getMaterial() == Material.LAVA;
-    }
-
-    @Override
-    public void travel(float strafe, float vertical, float forward) {
-        double d0 = this.posX;
-        double d1 = this.posY;
-        double d2 = this.posZ;
-
-        double d3 = this.motionY;
-        float f = this.jumpMovementFactor;
-        this.jumpMovementFactor = 0.05F;
-        this.collidedHorizontally = false;
-        this.collidedVertically = false;
-        this.collided = false;
-        super.travel(strafe, vertical, forward);
-        this.motionY = d3 * 0.6D;
-        this.jumpMovementFactor = f;
-        this.fallDistance = 0.0F;
-        this.setFlag(7, false);
-    }
-
     @Override
     public void setInWeb() {
+        return;
     }
 
     @Override
     public boolean isPushedByWater() {
         return false;
+    }
+
+    @Override
+    protected void dropEquipment(boolean wasRecentlyHit, int lootingModifier) {
+        return;
+    }
+
+    public boolean isAirOrLiquid(IBlockState state) {
+        return state.getMaterial() == Material.AIR || state.getMaterial().isLiquid();
     }
 
     public void setCreator(TileEntityCreator creator) {
@@ -207,9 +192,9 @@ public class EntityBuilder extends EntityCreature {
         if(this.creator != null) {
             boolean areaLoaded = this.world.isBlockLoaded(this.creator.getPos());
 
-            if (areaLoaded) {
+            if(areaLoaded) {
                 boolean teExists = this.world.getTileEntity(this.creator.getPos()) != null;
-                if (teExists)return;
+                if(teExists)return;
             }
         }
 

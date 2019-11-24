@@ -21,6 +21,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -209,10 +210,12 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
         this.inventory.setStackInSlot(2, blueprint);
         this.lastBlueprint = blueprint;
-        this.builderCount = 20;
+        this.builderCount = 5;
 
-        this.updatePendingBlock();
-        this.updateBuilders();
+        if(this.world.getTotalWorldTime() % 3 == 0) {
+            this.updatePendingBlock();
+            this.updateBuilders();
+        }
     }
 
     private void updatePendingBlock() {
@@ -238,7 +241,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                         if(!wantedState.getBlock().canPlaceBlockAt(this.world, offsettedPos))continue;
                         if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState))continue;
                         ItemStack material = MaterialList.getItem(this.world, wantedState, offsettedPos);
-                        if(this.getBuildingStack(material, true).isEmpty())continue;
+                        if(material.isEmpty() || this.getBuildingStack(material, true).isEmpty())continue;
 
                         blocksNeeded.add(new Pair<>(offsettedPos, wantedState));
                         placed = true;
@@ -304,7 +307,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
             if(pendingBlock.getKey() != null) {
                 ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
 
-                if (this.getBuildingStack(material, true).isEmpty()) {
+                if (material.isEmpty() || this.getBuildingStack(material, true).isEmpty()) {
                     pendingBlock.setKey(null);
                 }
             }
@@ -432,6 +435,11 @@ public class TileEntityCreator extends TileEntity implements ITickable {
         }
 
         return this.pendingBlocks.get(i).getValue();
+    }
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
+        return oldState.getBlock() != InitBlock.CREATOR || newSate.getBlock() != InitBlock.CREATOR;
     }
 
 }
