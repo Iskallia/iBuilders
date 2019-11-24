@@ -1,8 +1,6 @@
 package iskallia.ibuilders.init;
 
 import iskallia.ibuilders.Builders;
-import iskallia.ibuilders.block.entity.TileEntityMarker;
-import iskallia.ibuilders.block.render.TESRMarker;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -15,16 +13,12 @@ public class InitModel {
         registerSimpleItemModel(InitItem.BLUEPRINT, 0);
         registerSimpleItemModel(InitItem.SCHEMATIC_RELOCATOR, 0);
         registerSimpleItemModel(InitItem.SPAWN_EGG_BUILDER, 0);
-
-        registerSimpleItemModel(InitBlock.ITEM_MARKER, 0);
     }
 
     public static void registerBlockModels() {
-        registerBlockModel(InitBlock.MARKER, 0);
     }
 
     public static void registerTileEntityRenderers() {
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMarker.class, new TESRMarker());
     }
 
     /* ---------------------------------- */

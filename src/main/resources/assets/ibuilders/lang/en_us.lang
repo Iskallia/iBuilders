@@ -8,12 +8,6 @@ use.build_blueprint.success=§aSuccessfully exported shape to Blueprint!
 tooltip.build_blueprint.empty=§8No block shape saved yet.
 use.blueprint.corner.far=§3Too far away!
 
-# Markers
-tile.schema_marker.name=Schema Marker
-use.block_marker.success=§aSuccessfully connected markers!
-use.block_marker.failure=§4Failed to connect markers..
-use.block_marker.disconnected=§3Disconnected markers
-
 # Schematic Translocator
 use.schematic_relocator.bound.success=§aRelocator successfully bound!
 use.schematic_relocator.bound.fail=§3Cannot bind to this block...
