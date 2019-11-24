@@ -32,10 +32,14 @@ public class MaterialList {
         initializeOverrides();
 
         for(Behaviour override: OVERRIDES) {
-            if(override.matches(state)) {
-                ItemStack stack = override.getItem(world, state, pos);
-                //Builders.LOG.error(stack);
-                if(!stack.isEmpty())return stack;
+            try {
+                if (override.matches(state)) {
+                    ItemStack stack = override.getItem(world, state, pos);
+                    //Builders.LOG.error(stack);
+                    if (!stack.isEmpty()) return stack;
+                }
+            } catch(Exception e) {
+                //Builders.LOG.error("BlockState [" + state + "] threw an exception when fetching it's item.");
             }
         }
 
@@ -98,12 +102,8 @@ public class MaterialList {
 
             @Override
             public ItemStack getItem(World world, IBlockState state, BlockPos pos) {
-                try {
-                    //Why would one need anything else?
-                    return state.getBlock().getPickBlock(state, null, world, pos, null);
-                } catch(Exception e) {
-                    return ItemStack.EMPTY;
-                }
+                //Why would one need anything else?
+                return state.getBlock().getPickBlock(state, null, world, pos, null);
             }
         });
 
