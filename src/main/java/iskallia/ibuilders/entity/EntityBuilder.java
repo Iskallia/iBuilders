@@ -42,7 +42,6 @@ public class EntityBuilder extends EntityCreature {
         } else {
             this.pathFinder = new BuilderPathFinder(this);
             this.fakeUser = new FakeUser((WorldServer)this.world, new GameProfile(null, this.lastName));
-            this.fakeUser.setGameType(GameType.CREATIVE);
         }
 
         this.setCustomNameTag(this.lastName);
@@ -199,6 +198,22 @@ public class EntityBuilder extends EntityCreature {
         }
 
         this.setDead();
+    }
+
+    @Override
+    public void travel(float strafe, float vertical, float forward) {
+        double d0 = this.posX;
+        double d1 = this.posY;
+        double d2 = this.posZ;
+
+        double d3 = this.motionY;
+        float f = this.jumpMovementFactor;
+        this.jumpMovementFactor = 0.05f * (float)(this.isSprinting() ? 2 : 1);
+        super.travel(strafe, vertical, forward);
+        this.motionY = d3 * 0.6D;
+        this.jumpMovementFactor = f;
+        this.fallDistance = 0.0F;
+        this.setFlag(7, false);
     }
 
 }
