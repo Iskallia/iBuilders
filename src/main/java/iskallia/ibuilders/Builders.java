@@ -8,7 +8,8 @@ import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Builders.MOD_ID, name = Builders.MOD_NAME, version = Builders.MOD_VERSION)
+@Mod(modid = Builders.MOD_ID, name = Builders.MOD_NAME, version = Builders.MOD_VERSION,
+        dependencies = "required-before:schematica")
 public class Builders {
 
     public static final Logger LOG = LogManager.getLogger(Builders.MOD_NAME);
@@ -19,7 +20,7 @@ public class Builders {
 
     public static final String MOD_ID = "ibuilders";
     public static final String MOD_NAME = "iBuilders";
-    public static final String MOD_VERSION = "0.0.1";
+    public static final String MOD_VERSION = "0.0.2";
 
     public static Builders getInstance() {
         return INSTANCE;

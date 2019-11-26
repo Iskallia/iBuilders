@@ -18,7 +18,9 @@ public class EventMod {
 
     public static void onConstruction(FMLConstructionEvent event) {
         //Stops a crash bug, WTF?
-        new BuildersFormat().writeToNBT(new NBTTagCompound(), new BuildersSchematic(0, 0, 0));
+        if(event.getSide() == Side.CLIENT) {
+           new BuildersFormat().writeToNBT(new NBTTagCompound(), new BuildersSchematic(0, 0, 0));
+        }
     }
 
     public static void onPreInitialization(FMLPreInitializationEvent event) {
