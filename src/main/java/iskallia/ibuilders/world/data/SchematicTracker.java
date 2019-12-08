@@ -60,7 +60,7 @@ public class SchematicTracker extends WorldSavedData {
                     posData = ItemBlueprint.getCenterAndDimensions(firstCorner, secondCorner);
                 }
 
-                schematicMap.put(posData.getKey(), new BuildersSchematic(posData.getValue().x, posData.getValue().y, posData.getValue().z));
+                schematicMap.put(posData.getKey(), new BuildersSchematic(posData.getValue().getX(), posData.getValue().getY(), posData.getValue().getZ()));
             }
         });
 
@@ -76,39 +76,10 @@ public class SchematicTracker extends WorldSavedData {
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
-        /*
-        NBTTagList schematicEntries = nbt.getTagList("SchematicEntries", Constants.NBT.TAG_COMPOUND);
-
-        schematicEntries.forEach(rawSchematicEntry -> {
-            NBTTagCompound schematicEntry = (NBTTagCompound)rawSchematicEntry;
-
-            this.schematicMap.put(
-                    BlockPos.fromLong(schematicEntry.getLong("Key")),
-                    BuildersFormat.INSTANCE.readFromNBT(schematicEntry.getCompoundTag("Value"))
-            );
-        });
-
-        this.isChanged = true;
-        */
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        /*
-        NBTTagList schematicEntries = new NBTTagList();
-
-        this.schematicMap.forEach((key, value) -> {
-            NBTTagCompound schematicEntry = new NBTTagCompound();
-            NBTTagCompound schematic = new NBTTagCompound();
-            BuildersFormat.INSTANCE.writeToNBT(schematic, value);
-
-            schematicEntry.setLong("Key", key.toLong());
-            schematicEntry.setTag("Value", schematic);
-            schematicEntries.appendTag(schematicEntry);
-        });
-
-        compound.setTag("SchematicEntries", schematicEntries);
-         */
         return compound;
     }
 
