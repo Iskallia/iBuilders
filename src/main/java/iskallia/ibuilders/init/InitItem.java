@@ -1,6 +1,7 @@
 package iskallia.ibuilders.init;
 
 import iskallia.ibuilders.item.ItemBlueprint;
+import iskallia.ibuilders.item.ItemBuilderUpgrade;
 import iskallia.ibuilders.item.ItemSchematicRelocator;
 import iskallia.ibuilders.item.ItemSpawnEggBuilder;
 import net.minecraft.item.Item;
@@ -11,11 +12,13 @@ public class InitItem {
     public static ItemBlueprint BLUEPRINT = new ItemBlueprint("build_blueprint");
     public static ItemSchematicRelocator SCHEMATIC_RELOCATOR = new ItemSchematicRelocator("schematic_relocator");
     public static ItemSpawnEggBuilder SPAWN_EGG_BUILDER = new ItemSpawnEggBuilder("spawn_egg_builder");
+    public static ItemBuilderUpgrade BUILDER_UPGRADE = new ItemBuilderUpgrade("builder_upgrade");
 
     public static void registerItems(IForgeRegistry<Item> registry) {
         registerItem(BLUEPRINT, registry);
         registerItem(SCHEMATIC_RELOCATOR, registry);
         registerItem(SPAWN_EGG_BUILDER, registry);
+        registerItem(BUILDER_UPGRADE, registry);
     }
 
     /* --------------------------------- */

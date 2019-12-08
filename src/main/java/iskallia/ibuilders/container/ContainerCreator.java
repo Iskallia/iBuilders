@@ -32,6 +32,7 @@ public class ContainerCreator extends Container {
         this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 0, 0,0));
         this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 1, 20,0));
         this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 2, 40,0));
+        this.addSlotToContainer(new SlotItemHandler(this.creatorInventory, 3, 60,0));
 
         for(int l = 0; l < 3; ++l) {
             for(int k = 0; k < 9; ++k) {

@@ -12,6 +12,7 @@ public class InitModel {
         registerSimpleItemModel(InitItem.BLUEPRINT, 0);
         registerSimpleItemModel(InitItem.SCHEMATIC_RELOCATOR, 0);
         registerSimpleItemModel(InitItem.SPAWN_EGG_BUILDER, 0);
+        registerSimpleItemModel(InitItem.BUILDER_UPGRADE, 0);
     }
 
     public static void registerBlockModels() {

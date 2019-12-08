@@ -25,7 +25,7 @@ public class ContainerCreatorWorkers extends Container {
         for(int row = 0; row < 6; row++) {
             for(int column = 0; column < 9; column++) {
                 int slotId = row * 9 + column;
-                this.addSlotToContainer(new SlotItemHandler(inventory, slotId + 3, 8 + column * 18, 18 + row * 18));
+                this.addSlotToContainer(new SlotItemHandler(inventory, slotId + 4, 8 + column * 18, 18 + row * 18));
             }
         }
 

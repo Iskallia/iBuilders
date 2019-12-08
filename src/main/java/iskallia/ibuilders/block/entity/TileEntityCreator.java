@@ -7,6 +7,7 @@ import iskallia.ibuilders.block.BlockFacing;
 import iskallia.ibuilders.entity.EntityBuilder;
 import iskallia.ibuilders.init.InitBlock;
 import iskallia.ibuilders.init.InitItem;
+import iskallia.ibuilders.item.ItemBuilderUpgrade;
 import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import iskallia.ibuilders.util.MaterialList;
@@ -14,12 +15,15 @@ import iskallia.ibuilders.util.Pair;
 import iskallia.ibuilders.world.data.SchematicTracker;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -36,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class TileEntityCreator extends TileEntity implements ITickable {
 
-    protected ItemStackHandler inventory = new ItemStackHandler(3 + 54) {
+    protected ItemStackHandler inventory = new ItemStackHandler(4 + 54) {
         @Nonnull
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
@@ -55,6 +59,8 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 return stack.getItem() == Items.PAPER;
             } else if(slot == 2) {
                 return stack.getItem() == InitItem.BLUEPRINT;
+            } else if(slot == 3) {
+                return stack.getItem() instanceof ItemBuilderUpgrade;
             }
 
             return stack.getItem() == iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER;
@@ -71,7 +77,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     private int layer;
     private List<EntityBuilder> builders = new ArrayList<>();
     private List<Pair<BlockPos, IBlockState>> pendingBlocks = new ArrayList<>();
-    private int builderCount = 5;
+    private int builderCount = 1;
 
 
     public TileEntityCreator() {
@@ -80,8 +86,9 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
     public BuildersSchematic getSchematic() {
         int pendingBlocksCount = (int)this.pendingBlocks.stream().filter(pendingBlock -> pendingBlock.getKey() != null).count();
-
+        System.out.println(pendingBlocksCount);
         if(pendingBlocksCount == 0) {
+
             return this.schematic;
         }
 
@@ -210,16 +217,41 @@ public class TileEntityCreator extends TileEntity implements ITickable {
 
         this.inventory.setStackInSlot(2, blueprint);
         this.lastBlueprint = blueprint;
-        this.builderCount = 5;
+        this.builderCount = 1;
 
-        if(this.world.getTotalWorldTime() % 3 == 0) {
-            this.updatePendingBlock();
-            this.updateBuilders();
+        ItemStack upgrade = this.inventory.getStackInSlot(3);
+
+        if(!upgrade.isEmpty() && upgrade.getItem() == InitItem.BUILDER_UPGRADE) {
+            this.builderCount += upgrade.getCount();
         }
+
+        this.updateBuilders();
+        this.updatePendingBlock();
     }
 
     private void updatePendingBlock() {
         if(this.schematic == null || this.offset == null)return;
+
+        this.pendingBlocks.forEach(pendingBlock -> {
+            BlockPos pendingPos = pendingBlock.getKey();
+
+            if(pendingPos != null) {
+                IBlockState wantedState = this.schematic.getBlockState(pendingPos.subtract(this.offset).subtract(this.pos));
+                IBlockState actualState = this.world.getBlockState(pendingPos);
+
+                if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
+                    pendingBlock.setKey(null);
+                }
+            }
+
+            if(pendingBlock.getKey() != null) {
+                ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
+
+                if (material.isEmpty() || this.getBuildingStack(material, true).isEmpty()) {
+                    pendingBlock.setKey(null);
+                }
+            }
+        });
 
         int pendingBlocksCount = (int)this.pendingBlocks.stream().filter(pendingBlock -> pendingBlock.getKey() != null).count();
 
@@ -291,33 +323,14 @@ public class TileEntityCreator extends TileEntity implements ITickable {
             }
 
         }
-
-        this.pendingBlocks.forEach(pendingBlock -> {
-            BlockPos pendingPos = pendingBlock.getKey();
-
-            if(pendingPos != null) {
-                IBlockState wantedState = this.schematic.getBlockState(pendingPos.subtract(this.offset).subtract(this.pos));
-                IBlockState actualState = this.world.getBlockState(pendingPos);
-
-                if(wantedState.getBlock() == actualState.getBlock() || !this.isAirOrLiquid(actualState)) {
-                    pendingBlock.setKey(null);
-                }
-            }
-
-            if(pendingBlock.getKey() != null) {
-                ItemStack material = MaterialList.getItem(this.world, pendingBlock.getValue(), pendingBlock.getKey());
-
-                if (material.isEmpty() || this.getBuildingStack(material, true).isEmpty()) {
-                    pendingBlock.setKey(null);
-                }
-            }
-        });
     }
 
-    public ItemStack getBuildingStack(ItemStack wantedStack, boolean simulate) {
+    public List<IItemHandler> getInventories() {
         IBlockState state = this.world.getBlockState(this.pos);
-        if(state.getBlock() != InitBlock.CREATOR)return ItemStack.EMPTY;
+        if(state.getBlock() != InitBlock.CREATOR)return new ArrayList<>();
         EnumFacing facing = state.getValue(BlockFacing.FACING);
+
+        List<IItemHandler> handlers = new ArrayList<>();
 
         EnumFacing[] directions = new EnumFacing[] {
                 facing.getOpposite(),
@@ -325,21 +338,28 @@ public class TileEntityCreator extends TileEntity implements ITickable {
                 facing.getOpposite().rotateYCCW().getOpposite()
         };
 
-        ItemStack completedStack = wantedStack.copy();
-        int neededCount = wantedStack.getCount();
-
         for(EnumFacing direction: directions) {
             TileEntity tileEntity = world.getTileEntity(this.pos.offset(direction));
             if(tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
                 IItemHandler itemHandler = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
+                handlers.add(itemHandler);
+            }
+        }
 
-                for(int i = 0; i < itemHandler.getSlots() && neededCount > 0; i++) {
-                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-                    if(stackInSlot.isEmpty())continue;
-                    if(!canItemStacksStackRelaxed(wantedStack, stackInSlot))continue;
-                    ItemStack extractedStack = itemHandler.extractItem(i, neededCount, simulate);
-                    neededCount -= extractedStack.getCount();
-                }
+        return handlers;
+    }
+
+    public ItemStack getBuildingStack(ItemStack wantedStack, boolean simulate) {
+        ItemStack completedStack = wantedStack.copy();
+        int neededCount = wantedStack.getCount();
+
+        for (IItemHandler itemHandler : this.getInventories()) {
+            for(int i = 0; i < itemHandler.getSlots() && neededCount > 0; i++) {
+                ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                if(stackInSlot.isEmpty())continue;
+                if(!canItemStacksStackRelaxed(wantedStack, stackInSlot))continue;
+                ItemStack extractedStack = itemHandler.extractItem(i, neededCount, simulate);
+                neededCount -= extractedStack.getCount();
             }
         }
 
@@ -390,7 +410,7 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     }
 
     public ItemStack getAndRemoveSub() {
-        for(int i = 3; i < this.inventory.getSlots(); i++) {
+        for(int i = 4; i < this.inventory.getSlots(); i++) {
             ItemStack stack = this.inventory.getStackInSlot(i).copy();
             if(stack.isEmpty())continue;
             if(stack.getItem() != iskallia.itraders.init.InitItem.SPAWN_EGG_FIGHTER)continue;
@@ -440,6 +460,24 @@ public class TileEntityCreator extends TileEntity implements ITickable {
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
         return oldState.getBlock() != InitBlock.CREATOR || newSate.getBlock() != InitBlock.CREATOR;
+    }
+
+    public void collectStack(ItemStack item) {
+        ItemStack stack = item.copy();
+        item.setCount(0);
+
+        for(IItemHandler itemHandler: this.getInventories()) {
+            for(int i = 0; i < itemHandler.getSlots() && !stack.isEmpty(); i++) {
+                stack = itemHandler.insertItem(i, stack, false);
+            }
+        }
+
+        if(stack.isEmpty())return;
+
+        this.world.playSound(null, this.pos.getX(), this.pos.getY(), this.pos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+        EntityItem entityItem = new EntityItem(this.world, this.pos.getX() + 0.5D, this.pos.getY() + 1.5D, this.pos.getZ() + 0.5D, stack.copy());
+        entityItem.setDefaultPickupDelay();
+        this.world.spawnEntity(entityItem);
     }
 
 }
