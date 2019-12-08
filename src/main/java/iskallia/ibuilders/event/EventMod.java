@@ -1,5 +1,6 @@
 package iskallia.ibuilders.event;
 
+import com.github.lunatrius.schematica.handler.client.RenderTickHandler;
 import iskallia.ibuilders.Builders;
 import iskallia.ibuilders.command.CommandDebugBuilders;
 import iskallia.ibuilders.gui.GuiHandler;
@@ -10,6 +11,7 @@ import iskallia.ibuilders.schematic.BuildersFormat;
 import iskallia.ibuilders.schematic.BuildersSchematic;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.GameType;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -44,6 +46,7 @@ public class EventMod {
     public static void onPostInitialization(FMLPostInitializationEvent event) {
         InitConfig.registerConfigs();
         InitSchematic.registerSchematics();
+        MinecraftForge.EVENT_BUS.unregister(RenderTickHandler.INSTANCE);
     }
 
     public static void onServerStart(FMLServerStartingEvent event) {
