@@ -31,12 +31,12 @@ public class MegaSchematic implements ISchematic {
     public void clear() {
         this.schematics.forEach(schematicWrapper -> {
             Minecraft.getMinecraft().world.markBlockRangeForRenderUpdate(
-                        schematicWrapper.pos.x,
-                        schematicWrapper.pos.y,
-                        schematicWrapper.pos.z,
-                        schematicWrapper.pos.x + schematicWrapper.schematic.getWidth(),
-                        schematicWrapper.pos.y + schematicWrapper.schematic.getHeight(),
-                        schematicWrapper.pos.z + schematicWrapper.schematic.getLength()
+                        schematicWrapper.pos.getX(),
+                        schematicWrapper.pos.getY(),
+                        schematicWrapper.pos.getZ(),
+                        schematicWrapper.pos.getX() + schematicWrapper.schematic.getWidth(),
+                        schematicWrapper.pos.getY() + schematicWrapper.schematic.getHeight(),
+                        schematicWrapper.pos.getZ() + schematicWrapper.schematic.getLength()
                 );
         });
 
@@ -48,12 +48,12 @@ public class MegaSchematic implements ISchematic {
         this.schematics.add(schematicWrapper);
 
         Minecraft.getMinecraft().world.markBlockRangeForRenderUpdate(
-                schematicWrapper.pos.x,
-                schematicWrapper.pos.y,
-                schematicWrapper.pos.z,
-                schematicWrapper.pos.x + schematicWrapper.schematic.getWidth(),
-                schematicWrapper.pos.y + schematicWrapper.schematic.getHeight(),
-                schematicWrapper.pos.z + schematicWrapper.schematic.getLength()
+                schematicWrapper.pos.getX(),
+                schematicWrapper.pos.getY(),
+                schematicWrapper.pos.getZ(),
+                schematicWrapper.pos.getX() + schematicWrapper.schematic.getWidth(),
+                schematicWrapper.pos.getY() + schematicWrapper.schematic.getHeight(),
+                schematicWrapper.pos.getZ() + schematicWrapper.schematic.getLength()
         );
     }
 

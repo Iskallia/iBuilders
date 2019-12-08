@@ -46,7 +46,6 @@ public class SchematicWorlds {
             this.renderSchematic.setWorldAndLoadRenderers(this.schematicWorld);
             this.parentWorld.addEventListener(this.renderSchematic);
             ClientProxy.schematic = this.schematicWorld;
-
         }
     }
 
