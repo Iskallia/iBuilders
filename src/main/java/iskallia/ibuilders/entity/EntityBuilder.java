@@ -10,10 +10,15 @@ import net.minecraft.block.BlockDoor;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
@@ -22,6 +27,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+
+import java.util.List;
 
 public class EntityBuilder extends EntityCreature {
 
@@ -45,6 +52,17 @@ public class EntityBuilder extends EntityCreature {
         }
 
         this.setCustomNameTag(this.lastName);
+    }
+
+    @Override
+    protected void collideWithEntity(Entity entity) {
+        if(entity instanceof EntityItem && !entity.isDead) {
+            EntityItem item = (EntityItem)entity;
+            if(item.cannotPickup())return;
+            if(this.creator != null)this.creator.collectStack(item.getItem());
+            this.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+            item.setDead();
+        }
     }
 
     @Override
@@ -87,6 +105,11 @@ public class EntityBuilder extends EntityCreature {
 
         this.updateArmSwingProgress();
 
+
+        if(!this.world.isRemote) {
+            List<Entity> list = this.world.getEntitiesWithinAABB(EntityItem.class, this.getEntityBoundingBox().grow(1.0d, 1.0d, 1.0d));
+            list.forEach(this::collideWithEntity);
+        }
     }
 
     private void placeBlocks() {
