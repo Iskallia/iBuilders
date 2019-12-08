@@ -14,7 +14,7 @@ public class EventWorld {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
-        if(event.phase == TickEvent.Phase.END && !event.world.isRemote) {
+        if(event.phase == TickEvent.Phase.START && !event.world.isRemote) {
             if(SchematicTracker.get(event.world).getAndSetChanged(false) || event.world.getTotalWorldTime() % 40 == 0) {
                 event.world.playerEntities.forEach(player -> {
                     InitPacket.PIPELINE.sendTo(new S2CRenderSchematics(event.world), (EntityPlayerMP)player);
