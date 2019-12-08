@@ -35,7 +35,6 @@ public class BuilderPathFinder extends PathFinder {
             this.state.set(State.COMPUTING);
             this.findPath(this.builder.getPosition(), this.closerPos(this.builder.getPosition(), this.builder.getBuildTarget().up(1)));
             this.state.set(State.PATHFINDING);
-            //Builders.LOG.error("Target is " + this.finalPath + "!");
             this.node = null;
         } else if(this.state.get() == State.PATHFINDING) {
             if(this.node == null || this.node.agent == null) {
